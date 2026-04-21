@@ -1,0 +1,13 @@
+# FastAPI web framework
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+
+# Server-Sent Events for streaming responses
+sse-starlette>=2.1.0
+
+# Foundry Agent Service SDK (same as foundry-agent)
+azure-ai-projects>=2.0.0
+azure-identity>=1.19.0
+
+# Environment variable management
+python-dotenv>=1.0.0

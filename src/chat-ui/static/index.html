@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CIMIC Project Advisor</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>CIMIC</h2>
+        <span class="subtitle">Project Advisor</span>
+      </div>
+      <button id="new-chat-btn" class="new-chat-btn">+ New Chat</button>
+      <nav id="chat-history" class="chat-history"></nav>
+      <div class="sidebar-footer">
+        <span class="powered-by">Powered by Azure AI Foundry</span>
+      </div>
+    </aside>
+
+    <!-- Main chat area -->
+    <main class="chat-main">
+      <!-- Header -->
+      <header class="chat-header">
+        <h1>CIMIC Project Intelligence Advisor</h1>
+        <span class="status-badge" id="status-badge">Connecting…</span>
+      </header>
+
+      <!-- Messages -->
+      <div class="messages" id="messages">
+        <div class="welcome-message">
+          <div class="welcome-icon">🏗️</div>
+          <h2>Welcome to CIMIC Project Advisor</h2>
+          <p>I can help you with project performance insights, financial analysis, safety metrics, and procurement data.</p>
+          <div class="suggestions">
+            <button class="suggestion" data-prompt="What is CIMIC's LTIFR target for 2025?">
+              📊 LTIFR target for 2025
+            </button>
+            <button class="suggestion" data-prompt="Calculate EVM metrics: budget AUD 450M, actual costs AUD 412M, planned value AUD 420M">
+              💰 EVM calculation
+            </button>
+            <button class="suggestion" data-prompt="What cost variance threshold triggers a red flag on CIMIC projects?">
+              🚩 Cost variance thresholds
+            </button>
+            <button class="suggestion" data-prompt="Summarise CIMIC's safety policy for subcontractor management">
+              🦺 Safety policy summary
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input area -->
+      <div class="input-area">
+        <form id="chat-form" class="chat-form">
+          <div class="input-wrapper">
+            <textarea
+              id="user-input"
+              placeholder="Ask about project performance, financials, safety, or governance…"
+              rows="1"
+              autofocus
+            ></textarea>
+            <button type="submit" id="send-btn" class="send-btn" disabled>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+          <p class="disclaimer">AI-generated responses — always verify critical data with your project systems.</p>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/chat.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+# Foundry Agent Service SDK (V2)
+azure-ai-projects>=2.0.0
+
+# Azure identity
+azure-identity>=1.19.0
+
+# Environment variable management
+python-dotenv>=1.0.0
