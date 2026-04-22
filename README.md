@@ -4,7 +4,7 @@
 
 **Duration:** Full-day workshop (5.5–7 hours)  
 **Level:** Intermediate  
-**Approach:** Low-code via Microsoft Foundry Agent Service
+**Approach:** Low-code and pro-code via Microsoft Foundry Agent Service
 
 ---
 
@@ -92,3 +92,17 @@ The workshop uses simulated datasets representing a construction company's opera
 ## Getting Started
 
 Begin with **[Module 1: Microsoft Foundry Setup](modules/01-foundry-setup.md)**.
+
+---
+
+## Source Code (`src/`)
+
+The `src/` directory contains three standalone implementations that complement the workshop modules:
+
+| Directory | Description | Related Module |
+|-----------|-------------|----------------|
+| [`src/foundry-agent/`](src/foundry-agent/) | **Pro-code Agent** — Creates the same Prompt Agent from Module 2 programmatically using the Foundry Python SDK, with File Search + Code Interpreter | Module 2 |
+| [`src/chat-ui/`](src/chat-ui/) | **Chat UI** — Browser-based streaming chat interface (FastAPI + SSE) that consumes a Foundry agent, following the [Basic Foundry Chat](https://learn.microsoft.com/azure/architecture/ai-ml/architecture/basic-microsoft-foundry-chat) reference architecture | Module 5 |
+| [`src/eval/`](src/eval/) | **Agent Evaluation** — Batch evaluation script using the Foundry SDK with 10 test cases and 5 built-in evaluators (task adherence, intent resolution, tool accuracy, coherence, safety) | Module 5 |
+
+Each folder has its own `README.md` with setup instructions and prerequisites.
