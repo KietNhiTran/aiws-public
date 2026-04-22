@@ -1,4 +1,4 @@
-# CIMIC Project Governance Framework
+# Contoso Construction Group Project Governance Framework
 
 ## Cost Control Thresholds
 

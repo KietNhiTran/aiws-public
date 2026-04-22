@@ -1,5 +1,5 @@
 """
-CIMIC Project Advisor — Chat UI Backend (FastAPI)
+Project Advisor — Chat UI Backend (FastAPI)
 
 A thin API layer between a browser-based chat UI and Foundry Agent Service.
 Follows the Basic Microsoft Foundry Chat reference architecture pattern:
@@ -32,7 +32,7 @@ load_dotenv(override=False)
 # Configuration
 # ---------------------------------------------------------------------------
 PROJECT_ENDPOINT = os.environ.get("PROJECT_ENDPOINT", "")
-AGENT_NAME = os.environ.get("AGENT_NAME", "cimic-project-advisor")
+AGENT_NAME = os.environ.get("AGENT_NAME", "project-advisor")
 PORT = int(os.environ.get("PORT", "8000"))
 
 logger = logging.getLogger("chat-ui")
@@ -71,7 +71,7 @@ async def lifespan(app: FastAPI):
 # FastAPI app
 # ---------------------------------------------------------------------------
 app = FastAPI(
-    title="CIMIC Project Advisor — Chat UI",
+    title="Project Advisor — Chat UI",
     lifespan=lifespan,
 )
 

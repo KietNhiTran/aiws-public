@@ -138,7 +138,7 @@ When using private endpoints, configure DNS resolution:
 
 1. **"We can't use public endpoints in production."** → Foundry V2 supports full private networking via BYO VNet (GA) or Managed VNet (preview). Both options disable public access entirely.
 
-2. **"What's the simplest path to network isolation?"** → Managed VNet is simpler but preview. BYO VNet is GA and gives full control. For CIMIC's Australia East region, both are supported.
+2. **"What's the simplest path to network isolation?"** → Managed VNet is simpler but preview. BYO VNet is GA and gives full control. Both options are supported in most Azure regions.
 
 3. **"Can we connect to on-premises resources?"** → Yes, via Application Gateway with private endpoints. Both L4 and L7 traffic supported (GA).
 

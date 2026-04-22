@@ -14,13 +14,13 @@ Microsoft Foundry supports two agent types:
 | **Prompt Agent** | LLM-backed agents configured via the portal with system instructions and tools. No custom code needed. | Low-code scenarios, rapid prototyping, business-user-driven agents |
 | **Hosted Agent** | Container-based agents running custom code (Python/C#) with full framework control. | Complex logic, multi-agent workflows, custom integrations |
 
-In this module, we use **Prompt Agent** — the low-code approach ideal for CIMIC teams who want to build agents without deep programming expertise.
+In this module, we use **Prompt Agent** — the low-code approach ideal for teams who want to build agents without deep programming expertise.
 
 ---
 
-## 2.2 CIMIC Scenario: Project Cost Advisor Agent
+## 2.2 Scenario: Project Cost Advisor Agent
 
-We'll build an agent that CIMIC project managers can query for:
+We'll build an agent that project managers can query for:
 - Project budget summaries and cost variance analysis
 - Equipment utilization metrics
 - Safety compliance status
@@ -33,7 +33,7 @@ We'll build an agent that CIMIC project managers can query for:
 ### Step 1: Navigate to Agent Service
 
 1. In Microsoft Foundry portal ([ai.azure.com](https://ai.azure.com)), ensure the **New Foundry** toggle is **ON**
-2. Select your project `cimic-project-intelligence` from the upper-left project selector
+2. Select your project `project-intelligence` from the upper-left project selector
 3. On top menu, click **Agents**
 4. Click **+ New agent**
 
@@ -41,7 +41,7 @@ We'll build an agent that CIMIC project managers can query for:
 
 | Field | Value |
 |-------|-------|
-| Agent name | `cimic-project-advisor` |
+| Agent name | `project-advisor` |
 | Model deployment | `gpt-4o` (the model deployed in Module 1) |
 
 ### Step 3: Write System Instructions
@@ -51,7 +51,7 @@ The system instructions define the agent's persona, behavior, and boundaries. A 
 Paste the following:
 
 ```
-You are the CIMIC Project Intelligence Advisor, an AI assistant built for CIMIC Group
+You are the Project Intelligence Advisor, an AI assistant built for Contoso Construction Group
 project managers and operations teams.
 
 ## Your Role
@@ -62,12 +62,12 @@ project managers and operations teams.
 - Advise on procurement timing and supplier performance
 
 ## Your Knowledge Domain
-- CIMIC Group's current operating companies are ONLY the following:
-  • CPB Contractors (construction)
-  • Thiess (contract services)
-  • Sedgman (mineral processing)
-  • Pacific Partnerships (public-private partnerships)
-- Do NOT mention former subsidiaries (e.g., UGL) unless the user specifically asks
+- Contoso Construction Group's current operating companies are ONLY the following:
+  • Contoso Build (construction)
+  • Contoso Mining (contract services)
+  • Contoso Engineering (mineral processing)
+  • Contoso Partnerships (public-private partnerships)
+- Do NOT mention former subsidiaries unless the user specifically asks
   about historical company structure
 - Projects span road/rail infrastructure, tunnelling, building construction, and resource operations
 - Financial metrics follow Australian construction industry standards (AS/NZS)
@@ -131,13 +131,13 @@ Try these prompts to verify the agent's persona:
 ```
 Who are you and what can you help me with?
 ```
-*Expected: Agent identifies as CIMIC Project Intelligence Advisor with listed capabilities.*
+*Expected: Agent identifies as Project Intelligence Advisor with listed capabilities.*
 
 **Prompt 2 — Domain knowledge:**
 ```
-What are the main operating companies under CIMIC Group?
+What are the main operating companies under Contoso Construction Group?
 ```
-*Expected: Lists CPB Contractors, Thiess, Sedgman, Pacific Partnerships — and **only** these four. The agent should not mention former subsidiaries like UGL (divested ~2020) because the Knowledge Domain section uses an exclusive list.*
+*Expected: Lists Contoso Build, Contoso Mining, Contoso Engineering, Contoso Partnerships — and **only** these four. The agent should not mention former subsidiaries because the Knowledge Domain section uses an exclusive list.*
 
 **Prompt 3 — Boundary test:**
 ```
@@ -151,18 +151,18 @@ What is the current budget for the Sydney Metro West project?
 
 ## 2.5 Add a Knowledge Base with File Search
 
-File Search allows the agent to search through uploaded documents — ideal for CIMIC's project reports, safety manuals, and procurement guides.
+File Search allows the agent to search through uploaded documents — ideal for project reports, safety manuals, and procurement guides.
 
 ### Step 1: Prepare Sample Documents
 
 Create these sample files (or use provided workshop files):
 
-**`cimic-safety-policy-2025.md`:**
+**`safety-policy-2025.md`:**
 ```markdown
-# CIMIC Group HSE Policy 2025
+# Company HSE Policy 2025
 
 ## Zero Harm Commitment
-CIMIC Group is committed to Zero Harm across all operations.
+Contoso Construction Group is committed to Zero Harm across all operations.
 Target: Zero fatalities, Lost Time Injury Frequency Rate (LTIFR) < 1.0
 
 ## Incident Reporting
@@ -171,7 +171,7 @@ Target: Zero fatalities, Lost Time Injury Frequency Rate (LTIFR) < 1.0
 - Critical incidents trigger immediate stop-work authority
 
 ## PPE Requirements
-All personnel on CIMIC sites must wear:
+All personnel on company sites must wear:
 - Hard hat (AS/NZS 1801)
 - Safety glasses (AS/NZS 1337)
 - High-visibility vest (AS/NZS 4602)
@@ -185,7 +185,7 @@ All personnel on CIMIC sites must wear:
 
 **`project-governance-framework.md`:**
 ```markdown
-# CIMIC Project Governance Framework
+# Project Governance Framework
 
 ## Cost Control Thresholds
 | Metric | Green | Amber | Red |
@@ -220,12 +220,12 @@ All personnel on CIMIC sites must wear:
 In the chat playground, test:
 
 ```
-What is CIMIC's LTIFR target for 2025?
+What is the company's LTIFR target for 2025?
 ```
 *Expected: Agent retrieves from the safety policy — target is < 1.0, FY2024 actual was 0.82.*
 
 ```
-What cost variance threshold triggers a red flag on CIMIC projects?
+What cost variance threshold triggers a red flag?
 ```
 *Expected: Agent retrieves governance framework — CV < -10% is Red.*
 
@@ -243,7 +243,7 @@ Code Interpreter enables the agent to execute Python code for calculations and d
 ### Step 2: Test Code Interpreter
 
 ```
-If a CIMIC project has a budget of AUD 450M, actual costs of AUD 412M, 
+If a project has a budget of AUD 450M, actual costs of AUD 412M, 
 and planned value of AUD 420M, calculate the Cost Variance, 
 Schedule Variance, CPI, and SPI. Show the formulas.
 ```
@@ -286,9 +286,9 @@ Memory operates in three phases:
 | **User profile memory** | Static preferences about the user (e.g., preferred name, reporting format, project assignment) | Once at the start of each conversation |
 | **Chat summary memory** | Distilled summaries of topics covered in previous sessions | Per turn, based on relevance to the current message |
 
-### CIMIC Use Case
+### Use Case Example
 
-Imagine a CIMIC project manager who regularly uses the agent:
+Imagine a project manager who regularly uses the agent:
 - **Session 1:** "I'm the PM for the Pacific Highway Upgrade. I prefer cost reports in table format with AUD figures."
 - **Session 2 (days later):** "Show me the latest cost variance."
   - With memory, the agent already knows the user's project, preferred format, and currency — no need to repeat.
@@ -330,7 +330,7 @@ What do you know about my preferences?
 | **Security** | Protect against prompt injection and memory corruption — malicious inputs could try to plant false "memories" |
 | **Deletion** | Users can request deletion of their memory data. Use the Memory Store API to delete by scope |
 
-> **Important for CIMIC:** In a production deployment, ensure memory scope is mapped to authenticated user identities (via Microsoft Entra ID) and that memory retention policies comply with your data governance requirements.
+> **Important:** In a production deployment, ensure memory scope is mapped to authenticated user identities (via Microsoft Entra ID) and that memory retention policies comply with your data governance requirements.
 
 ### Further Reading
 
@@ -360,7 +360,7 @@ from azure.ai.projects import AIProjectClient
 # Connect to your Foundry project
 # Format: https://<foundry-resource>.ai.azure.com/api/projects/<project-name>
 PROJECT_ENDPOINT = "your_project_endpoint"
-AGENT_NAME = "cimic-project-advisor"
+AGENT_NAME = "project-advisor"
 
 project = AIProjectClient(
     endpoint=PROJECT_ENDPOINT,
@@ -377,10 +377,10 @@ conversation = openai_client.conversations.create()
 response = openai_client.responses.create(
     conversation=conversation.id,
     extra_body={"agent_reference": {"name": AGENT_NAME, "type": "agent_reference"}},
-    input="What is the LTIFR target for CIMIC?",
+    input="What is the company's LTIFR target?",
 )
 print(f"")
-print(f"User: What is the LTIFR target for CIMIC?")
+print(f"User: What is the company's LTIFR target?")
 print(f"Response output: {response.output_text}")
 
 
@@ -395,7 +395,7 @@ print(f"User: And what was the FY2024 actual?")
 print(f"Response output: {response.output_text}")
 ```
 
-> **Key Point:** The low-code agent you created in the portal is fully accessible via SDK/API. This means CIMIC's development team can integrate it into existing systems (e.g., project management portals, mobile apps) without rebuilding the agent.
+> **Key Point:** The low-code agent you created in the portal is fully accessible via SDK/API. This means the development team can integrate it into existing systems (e.g., project management portals, mobile apps) without rebuilding the agent.
 
 ---
 
@@ -403,20 +403,20 @@ print(f"Response output: {response.output_text}")
 
 | Component | Configuration |
 |-----------|---------------|
-| Agent name | `cimic-project-advisor` |
+| Agent name | `project-advisor` |
 | Agent type | Prompt (low-code) |
 | Model | GPT-4o |
 | Temperature | 0.3 |
 | Tools | File Search, Code Interpreter, Memory (preview, optional) |
 | Knowledge | Safety policy, Governance framework docs |
-| System prompt | CIMIC Project Intelligence Advisor persona with Data Source Policy and citation requirements |
+| System prompt | Project Intelligence Advisor persona with Data Source Policy and citation requirements |
 
 ---
 
 ## Checkpoint ✓
 
-- [ ] Prompt agent `cimic-project-advisor` created
-- [ ] System instructions configured with CIMIC persona **and Data Source Policy**
+- [ ] Prompt agent `project-advisor` created
+- [ ] System instructions configured with advisor persona **and Data Source Policy**
 - [ ] Agent responds correctly to identity and domain questions
 - [ ] **Boundary test passes** — agent refuses project-specific data without a connected source
 - [ ] File Search enabled with 2 documents uploaded
@@ -429,13 +429,13 @@ print(f"Response output: {response.output_text}")
 
 ## 2.10 Prompt Engineering Best Practices
 
-The system prompt we wrote in Step 3 follows established prompt engineering principles. Understanding these will help you build better agents for any CIMIC use case.
+The system prompt we wrote in Step 3 follows established prompt engineering principles. Understanding these will help you build better agents for any use case.
 
 ### Key Principles Applied
 
 | Principle | How We Applied It | Why It Matters |
 |-----------|-------------------|----------------|
-| **Define a clear persona** | "You are the CIMIC Project Intelligence Advisor..." | Anchors the agent's identity and prevents it from acting outside its role |
+| **Define a clear persona** | "You are the Project Intelligence Advisor..." | Anchors the agent's identity and prevents it from acting outside its role |
 | **Set explicit boundaries** | Data Source Policy section | Prevents hallucination by restricting the agent to connected data sources |
 | **Require source citation** | "Always cite your source explicitly" | Builds trust and allows users to verify information |
 | **Provide output format guidance** | "Use tables for comparative data", "Present in AUD" | Ensures consistent, professional responses across users |

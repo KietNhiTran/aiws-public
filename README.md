@@ -1,8 +1,7 @@
-# Microsoft Foundry Workshop — CIMIC Group
+# Microsoft Foundry Workshop — AI Agents for Infrastructure Operations
 
 ## Building Intelligent AI Agents for Infrastructure Operations
 
-**Customer:** CIMIC Group — Australia's leading infrastructure and construction company  
 **Duration:** Full-day workshop (5.5–7 hours)  
 **Level:** Intermediate  
 **Approach:** Low-code via Microsoft Foundry Agent Service
@@ -11,11 +10,13 @@
 
 ## Workshop Overview
 
-CIMIC Group operates across construction (CPB Contractors), services (Thiess, Sedgman), and partnerships (Pacific Partnerships). This workshop demonstrates how to build AI agents using **Microsoft Foundry** that leverage **Azure Databricks** as a data source — enabling intelligent decision support for project cost forecasting, equipment maintenance scheduling, safety incident analysis, and supply chain optimization.
+This workshop demonstrates how to build AI agents using **Microsoft Foundry** that leverage **Azure Databricks** as a data source — enabling intelligent decision support for project cost forecasting, equipment maintenance scheduling, safety incident analysis, and supply chain optimization.
+
+The sample scenario uses a fictional construction & infrastructure company (**Contoso Construction Group**) operating across construction (Contoso Build), mining services (Contoso Mining), engineering (Contoso Engineering), and partnerships (Contoso Partnerships).
 
 ### Demo Scenario: **Infrastructure Project Intelligence Agent**
 
-A CIMIC project manager needs an AI agent that can:
+A project manager needs an AI agent that can:
 - Query project financial data stored in Databricks (budget, schedule variance, RAG status)
 - Analyse equipment telemetry for predictive maintenance across the equipment fleet
 - Retrieve safety incident reports, generate trend charts, and compare against Zero Harm policy
@@ -31,7 +32,7 @@ A CIMIC project manager needs an AI agent that can:
 | 2 | [Build Your First Agent (Low-Code)](modules/02-build-agent-low-code.md) | 90 min | Create a Prompt agent via Foundry Agent Service portal |
 | 3 | [Integrate Azure Databricks as Data Source](modules/03-databricks-integration.md) | 90 min | Connect agents to Databricks via MCP-based Genie + Fabric mirroring |
 | 4 | [Azure Foundry Toolkit Deep Dive](modules/04-foundry-toolkit.md) | 60 min | Bing Grounding (hands-on), Azure AI Search & Custom Functions (concept walkthrough) |
-| 5 | [End-to-End Demo: CIMIC Project Intelligence Agent](modules/05-e2e-demo.md) | 30–45 min | Wire all tools together, run test scenarios, evaluate the agent |
+| 5 | [End-to-End Demo: Project Intelligence Agent](modules/05-e2e-demo.md) | 30–45 min | Wire all tools together, run test scenarios, evaluate the agent |
 
 ---
 
@@ -51,7 +52,7 @@ A CIMIC project manager needs an AI agent that can:
 ┌──────────────────────────────────────────────────────────────────┐
 │                    Microsoft Foundry                             │
 │  ┌────────────────────────────────────────────────────────────┐  │
-│  │  Foundry Resource → Project: cimic-project-intelligence    │  │
+│  │  Foundry Resource → Project: project-intelligence          │  │
 │  │                                                            │  │
 │  │  ┌────────────┐  ┌──────────────┐  ┌───────────────────┐  │  │
 │  │  │  Prompt     │  │ File Search  │  │ Code Interpreter  │  │  │
@@ -75,16 +76,16 @@ A CIMIC project manager needs an AI agent that can:
 
 ---
 
-## Sample Data Context (CIMIC Scenario)
+## Sample Data Context
 
-The workshop uses simulated datasets representing CIMIC's operations across multiple systems:
+The workshop uses simulated datasets representing a construction company's operations across multiple systems:
 
 | Dataset | Description | System | Table |
 |---------|-------------|--------|-------|
-| Project Financials | Cost tracking, budget vs. actuals, schedule variance | Azure Databricks | `cimic.projects.financials` |
-| Equipment Telemetry | Equipment fleet sensor data — engine temp, fuel, hours | Azure Databricks | `cimic.equipment.equipment_telemetry` |
-| Safety Incidents | HSE incident reports, near-misses, risk categories | Azure Databricks | `cimic.safety.incidents` |
-| Material Procurement | Supplier pricing, lead times, price trends | Azure Databricks | `cimic.procurement.materials` |
+| Project Financials | Cost tracking, budget vs. actuals, schedule variance | Azure Databricks | `workshop.projects.financials` |
+| Equipment Telemetry | Equipment fleet sensor data — engine temp, fuel, hours | Azure Databricks | `workshop.equipment.equipment_telemetry` |
+| Safety Incidents | HSE incident reports, near-misses, risk categories | Azure Databricks | `workshop.safety.incidents` |
+| Material Procurement | Supplier pricing, lead times, price trends | Azure Databricks | `workshop.procurement.materials` |
 
 ---
 

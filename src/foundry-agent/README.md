@@ -1,4 +1,4 @@
-# CIMIC Project Advisor — Foundry Agent Service (SDK)
+# Project Advisor — Foundry Agent Service (SDK)
 
 This is the **code-based equivalent** of the low-code Prompt Agent built in [Module 2](../../modules/02-build-your-first-agent.md). Instead of using the Foundry portal, it creates the same agent programmatically using the **Foundry Python SDK** (`azure-ai-projects`).
 
@@ -59,7 +59,7 @@ src/foundry-agent/
 └── README.md             # This file
 
 ../../sample-data/        # Knowledge-base documents uploaded to File Search
-├── cimic-safety-policy-2025.md
+├── safety-policy-2025.md
 └── project-governance-framework.md
 ```
 
@@ -75,7 +75,7 @@ project = AIProjectClient(endpoint=PROJECT_ENDPOINT, credential=DefaultAzureCred
 openai = project.get_openai_client()
 
 agent = project.agents.create_version(
-    agent_name="cimic-project-advisor",
+    agent_name="project-advisor",
     definition=PromptAgentDefinition(
         model="gpt-4o",
         instructions="...",
@@ -94,7 +94,7 @@ conversation = openai.conversations.create()
 
 response = openai.responses.create(
     conversation=conversation.id,
-    input="What is CIMIC's LTIFR target?",
+    input="What is the company's LTIFR target?",
     extra_body={"agent_reference": {"name": agent.name, "type": "agent_reference"}},
 )
 print(response.output_text)

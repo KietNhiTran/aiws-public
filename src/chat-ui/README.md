@@ -1,4 +1,4 @@
-# CIMIC Project Advisor — Chat UI
+# Project Advisor — Chat UI
 
 A browser-based chat interface that demonstrates how a **frontend client consumes a Foundry Agent Service agent**. This follows the [Basic Microsoft Foundry Chat reference architecture](https://learn.microsoft.com/azure/architecture/ai-ml/architecture/basic-microsoft-foundry-chat) pattern.
 
@@ -15,8 +15,8 @@ A browser-based chat interface that demonstrates how a **frontend client consume
                                                     ┌──────────▼───────────┐
                                                     │  Foundry Agent       │
                                                     │  Service             │
-                                                    │  (cimic-project-     │
-                                                    │   advisor agent)     │
+                                                    │  (project-advisor    │
+                                                    │   agent)             │
                                                     └──────────────────────┘
 ```
 
@@ -35,7 +35,7 @@ A browser-based chat interface that demonstrates how a **frontend client consume
 - Python 3.10+
 - Azure CLI logged in (`az login`) for `DefaultAzureCredential`
 - A **published** Foundry agent (created via Module 2 or `src/foundry-agent/agent.py`)
-- The agent name (default: `cimic-project-advisor`)
+- The agent name (default: `project-advisor`)
 
 ## Quick Start
 
@@ -91,13 +91,8 @@ src/chat-ui/
 ├── README.md             # This file
 └── static/
     ├── index.html        # Chat UI page
-    ├── styles.css        # CIMIC-branded styling
+    ├── styles.css        # Chat UI styling
     └── chat.js           # Client-side chat logic + SSE handling
-```
-
-## How It Works
-
-1. **User sends a message** → `chat.js` POSTs to `/api/chat` with the message and optional `conversation_id`.
 2. **Backend creates/reuses a Foundry conversation** → calls `openai.responses.create(stream=True)` with the agent reference.
 3. **Tokens stream back via SSE** → each delta event is rendered in the chat bubble in real-time.
 4. **Multi-turn context is preserved** → the same `conversation_id` is reused for follow-up messages.

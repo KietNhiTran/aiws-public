@@ -3,6 +3,8 @@
 **Duration:** 90 minutes  
 **Objective:** Connect your Foundry agent to Azure Databricks using the two most meaningful integration approaches — **MCP-based Genie** (zero-code, direct) and **Fabric mirroring** (enterprise data layer).
 
+> **Note:** This module is self-contained — all SQL DDL and sample data are provided inline below. For automated deployment scripts (Databricks Asset Bundles, Fabric workspace provisioning), this is not included in the workshop and need pr-configured.
+
 ---
 
 ## 3.1 Integration Options Overview
@@ -27,7 +29,7 @@ Both approaches are **zero-code** from the Foundry side and represent the curren
 
 ---
 
-## 3.2 Option 1: Databricks Genie via MCP (Recommended Primary)
+## 3.2 Option 1: Databricks Genie via MCP
 
 **Pattern:** Foundry Agent → MCP Tool (built-in) → Databricks Managed MCP Server → Genie Space → Unity Catalog data
 
@@ -99,8 +101,8 @@ If your Azure subscription already has a Databricks workspace with Unity Catalog
    | Field | Value |
    |-------|-------|
    | Subscription | Your Azure subscription |
-   | Resource Group | `rg-cimic-ai-workshop` (create new or use existing) |
-   | Workspace Name | `dbw-cimic-workshop` |
+   | Resource Group | `rg-ai-workshop` (create new or use existing) |
+   | Workspace Name | `dbw-workshop` |
    | Region | **Australia East** (same region as your Foundry resource from Module 1) |
    | Pricing Tier | **Premium** (required for Unity Catalog and Genie) |
 
@@ -131,7 +133,7 @@ If no metastore is assigned:
      | Region | Australia East |
      | ADLS Gen2 path | `abfss://<container>@<storage-account>.dfs.core.windows.net/` |
 
-   - After creating, click **Assign to workspace** → select `dbw-cimic-workshop`
+   - After creating, click **Assign to workspace** → select `dbw-workshop`
 
 > **Tip:** If you are a new Databricks customer, Azure auto-creates a metastore and assigns it to your workspace on first launch. Verify by running `SELECT current_metastore()` in a notebook.
 
@@ -145,7 +147,7 @@ Genie requires a **Pro** or **Serverless SQL Warehouse** to execute queries.
 
    | Field | Value |
    |-------|-------|
-   | Name | `cimic-ai-agent-warehouse` |
+   | Name | `ai-agent-warehouse` |
    | Cluster size | **2X-Small** (sufficient for workshop) |
    | Type | **Serverless** (recommended — auto-starts, no idle cost) or **Pro** |
    | Auto stop | **10 minutes** (saves cost during workshop pauses) |
@@ -169,21 +171,21 @@ After completing these steps, your Databricks environment is ready. Continue bel
 
 #### 3.2.0 Prepare Sample Data in Databricks
 
-Before creating the Genie Space, load the CIMIC demo datasets that Genie will query. Run these SQL statements in a Databricks notebook:
+Before creating the Genie Space, load the workshop demo datasets that Genie will query. Run these SQL statements in a Databricks notebook:
 
 ```sql
 -- Create catalog and schema
-CREATE CATALOG IF NOT EXISTS cimic;
-CREATE SCHEMA IF NOT EXISTS cimic.projects;
-CREATE SCHEMA IF NOT EXISTS cimic.equipment;
-CREATE SCHEMA IF NOT EXISTS cimic.safety;
-CREATE SCHEMA IF NOT EXISTS cimic.procurement;
+CREATE CATALOG IF NOT EXISTS workshop;
+CREATE SCHEMA IF NOT EXISTS workshop.projects;
+CREATE SCHEMA IF NOT EXISTS workshop.equipment;
+CREATE SCHEMA IF NOT EXISTS workshop.safety;
+CREATE SCHEMA IF NOT EXISTS workshop.procurement;
 ```
 
-**Project Financials** — budget, cost variance, EVM metrics for all CIMIC divisions:
+**Project Financials** — budget, cost variance, EVM metrics for all divisions:
 
 ```sql
-CREATE OR REPLACE TABLE cimic.projects.financials (
+CREATE OR REPLACE TABLE workshop.projects.financials (
     project_id STRING,
     project_name STRING,
     division STRING,
@@ -204,23 +206,23 @@ CREATE OR REPLACE TABLE cimic.projects.financials (
     project_manager STRING
 );
 
-INSERT INTO cimic.projects.financials VALUES
-('P-2024-001', 'Sydney Metro West - Station Fit-Out', 'CPB Contractors', 'Sydney Metro Authority', 'Rail Infrastructure', 'NSW', 850000000, 792000000, 810000000, 800000000, 2.1, 1.01, 1.02, 'green', '2023-01-15', '2026-06-30', '2025-03-31', 'Sarah Johnson'),
-('P-2024-002', 'Inland Rail - Narrabri to North Star', 'CPB Contractors', 'ARTC', 'Rail Infrastructure', 'NSW', 1200000000, 1150000000, 1080000000, 1100000000, -6.5, 0.98, 0.94, 'amber', '2022-06-01', '2026-12-31', '2025-03-31', 'Michael Chen'),
-('P-2024-003', 'WestConnex M4-M5 Link Tunnels', 'CPB Contractors', 'Transport for NSW', 'Road/Tunnel', 'NSW', 3200000000, 3450000000, 3100000000, 3150000000, -11.3, 0.98, 0.90, 'red', '2021-03-01', '2025-12-31', '2025-03-31', 'David Park'),
-('P-2024-004', 'Bowen Basin Resource Expansion', 'Thiess', 'BHP Mitsubishi Alliance', 'Contract Services', 'QLD', 650000000, 610000000, 620000000, 615000000, 1.6, 1.01, 1.02, 'green', '2023-07-01', '2027-06-30', '2025-03-31', 'Lisa Wang'),
-('P-2024-005', 'Mount Pleasant Operations', 'Thiess', 'MACH Energy', 'Contract Services', 'NSW', 420000000, 445000000, 400000000, 410000000, -11.3, 0.98, 0.90, 'red', '2022-01-01', '2026-12-31', '2025-03-31', 'James Morrison'),
-('P-2024-006', 'Olympic Dam Processing Plant Upgrade', 'Sedgman', 'BHP', 'Mineral Processing', 'SA', 280000000, 265000000, 270000000, 268000000, 1.9, 1.01, 1.02, 'green', '2023-09-01', '2025-09-30', '2025-03-31', 'Emma Nguyen'),
-('P-2024-007', 'Melbourne Metro Tunnel', 'CPB Contractors', 'Rail Projects Victoria', 'Rail Infrastructure', 'VIC', 2800000000, 2650000000, 2700000000, 2720000000, -1.8, 0.99, 1.02, 'green', '2020-06-01', '2025-12-31', '2025-03-31', 'Robert Taylor'),
-('P-2024-008', 'Carmichael Rail Network', 'Thiess', 'Adani', 'Rail Infrastructure', 'QLD', 550000000, 580000000, 520000000, 540000000, -11.5, 0.96, 0.90, 'red', '2023-03-01', '2026-03-31', '2025-03-31', 'Amanda Liu'),
-('P-2024-009', 'Perth Desalination Plant Expansion', 'Sedgman', 'Water Corporation WA', 'Water Infrastructure', 'WA', 180000000, 172000000, 175000000, 174000000, 1.7, 1.01, 1.02, 'green', '2024-01-01', '2026-06-30', '2025-03-31', 'Tom Richards'),
-('P-2024-010', 'Pacific Highway Upgrade - Coffs Harbour', 'CPB Contractors', 'Transport for NSW', 'Road Infrastructure', 'NSW', 950000000, 920000000, 900000000, 910000000, -2.2, 0.99, 0.98, 'green', '2022-09-01', '2026-03-31', '2025-03-31', 'Karen White');
+INSERT INTO workshop.projects.financials VALUES
+('P-2024-001', 'Sydney Metro West - Station Fit-Out', 'Contoso Build', 'Sydney Metro Authority', 'Rail Infrastructure', 'NSW', 850000000, 792000000, 810000000, 800000000, 2.1, 1.01, 1.02, 'green', '2023-01-15', '2026-06-30', '2025-03-31', 'Sarah Johnson'),
+('P-2024-002', 'Inland Rail - Narrabri to North Star', 'Contoso Build', 'ARTC', 'Rail Infrastructure', 'NSW', 1200000000, 1150000000, 1080000000, 1100000000, -6.5, 0.98, 0.94, 'amber', '2022-06-01', '2026-12-31', '2025-03-31', 'Michael Chen'),
+('P-2024-003', 'Metro Tunnel Link Tunnels', 'Contoso Build', 'Transport for NSW', 'Road/Tunnel', 'NSW', 3200000000, 3450000000, 3100000000, 3150000000, -11.3, 0.98, 0.90, 'red', '2021-03-01', '2025-12-31', '2025-03-31', 'David Park'),
+('P-2024-004', 'Northern Basin Resource Expansion', 'Contoso Mining', 'BHP Mitsubishi Alliance', 'Contract Services', 'QLD', 650000000, 610000000, 620000000, 615000000, 1.6, 1.01, 1.02, 'green', '2023-07-01', '2027-06-30', '2025-03-31', 'Lisa Wang'),
+('P-2024-005', 'Riverside Dam Operations', 'Contoso Mining', 'MACH Energy', 'Contract Services', 'NSW', 420000000, 445000000, 400000000, 410000000, -11.3, 0.98, 0.90, 'red', '2022-01-01', '2026-12-31', '2025-03-31', 'James Morrison'),
+('P-2024-006', 'Olympic Dam Processing Plant Upgrade', 'Contoso Engineering', 'BHP', 'Mineral Processing', 'SA', 280000000, 265000000, 270000000, 268000000, 1.9, 1.01, 1.02, 'green', '2023-09-01', '2025-09-30', '2025-03-31', 'Emma Nguyen'),
+('P-2024-007', 'Melbourne Metro Tunnel', 'Contoso Build', 'Rail Projects Victoria', 'Rail Infrastructure', 'VIC', 2800000000, 2650000000, 2700000000, 2720000000, -1.8, 0.99, 1.02, 'green', '2020-06-01', '2025-12-31', '2025-03-31', 'Robert Taylor'),
+('P-2024-008', 'Highland Mine Rail Network', 'Contoso Mining', 'Adani', 'Rail Infrastructure', 'QLD', 550000000, 580000000, 520000000, 540000000, -11.5, 0.96, 0.90, 'red', '2023-03-01', '2026-03-31', '2025-03-31', 'Amanda Liu'),
+('P-2024-009', 'Perth Desalination Plant Expansion', 'Contoso Engineering', 'Water Corporation WA', 'Water Infrastructure', 'WA', 180000000, 172000000, 175000000, 174000000, 1.7, 1.01, 1.02, 'green', '2024-01-01', '2026-06-30', '2025-03-31', 'Tom Richards'),
+('P-2024-010', 'Pacific Highway Upgrade - Coffs Harbour', 'Contoso Build', 'Transport for NSW', 'Road Infrastructure', 'NSW', 950000000, 920000000, 900000000, 910000000, -2.2, 0.99, 0.98, 'green', '2022-09-01', '2026-03-31', '2025-03-31', 'Karen White');
 ```
 
 **Equipment Telemetry** — heavy equipment fleet IoT sensor data:
 
 ```sql
-CREATE OR REPLACE TABLE cimic.equipment.equipment_telemetry (
+CREATE OR REPLACE TABLE workshop.equipment.equipment_telemetry (
     equipment_id STRING,
     equipment_type STRING,
     site_name STRING,
@@ -233,25 +235,25 @@ CREATE OR REPLACE TABLE cimic.equipment.equipment_telemetry (
     reading_timestamp TIMESTAMP
 );
 
-INSERT INTO cimic.equipment.equipment_telemetry VALUES
-('HT-001', 'haul_truck', 'Bowen Basin', 'Thiess', 92.5, 78.0, 12450, '2025-05-15', 'operational', '2025-04-14 08:00:00'),
-('HT-002', 'haul_truck', 'Bowen Basin', 'Thiess', 110.3, 45.0, 15800, '2025-04-20', 'warning', '2025-04-14 08:00:00'),
-('HT-003', 'haul_truck', 'Mount Pleasant', 'Thiess', 88.0, 92.0, 8900, '2025-06-01', 'operational', '2025-04-14 08:00:00'),
-('EX-001', 'excavator', 'Bowen Basin', 'Thiess', 85.0, 65.0, 9800, '2025-05-20', 'operational', '2025-04-14 08:00:00'),
-('EX-002', 'excavator', 'Mount Pleasant', 'Thiess', 115.8, 30.0, 18200, '2025-04-16', 'critical', '2025-04-14 08:00:00'),
-('DR-001', 'drill', 'Bowen Basin', 'Thiess', 78.0, 88.0, 6500, '2025-07-01', 'operational', '2025-04-14 08:00:00'),
-('DR-002', 'drill', 'Carmichael', 'Thiess', 95.0, 55.0, 11200, '2025-04-25', 'operational', '2025-04-14 08:00:00'),
-('LD-001', 'loader', 'Olympic Dam', 'Sedgman', 82.0, 70.0, 7800, '2025-06-15', 'operational', '2025-04-14 08:00:00'),
-('DZ-001', 'dozer', 'Bowen Basin', 'Thiess', 90.0, 60.0, 13500, '2025-05-01', 'operational', '2025-04-14 08:00:00'),
-('HT-004', 'haul_truck', 'Carmichael', 'Thiess', 98.0, 35.0, 14200, '2025-04-18', 'warning', '2025-04-14 08:00:00');
+INSERT INTO workshop.equipment.equipment_telemetry VALUES
+('HT-001', 'haul_truck', 'Northern Basin', 'Contoso Mining', 92.5, 78.0, 12450, '2025-05-15', 'operational', '2025-04-14 08:00:00'),
+('HT-002', 'haul_truck', 'Northern Basin', 'Contoso Mining', 110.3, 45.0, 15800, '2025-04-20', 'warning', '2025-04-14 08:00:00'),
+('HT-003', 'haul_truck', 'Riverside Dam', 'Contoso Mining', 88.0, 92.0, 8900, '2025-06-01', 'operational', '2025-04-14 08:00:00'),
+('EX-001', 'excavator', 'Northern Basin', 'Contoso Mining', 85.0, 65.0, 9800, '2025-05-20', 'operational', '2025-04-14 08:00:00'),
+('EX-002', 'excavator', 'Riverside Dam', 'Contoso Mining', 115.8, 30.0, 18200, '2025-04-16', 'critical', '2025-04-14 08:00:00'),
+('DR-001', 'drill', 'Northern Basin', 'Contoso Mining', 78.0, 88.0, 6500, '2025-07-01', 'operational', '2025-04-14 08:00:00'),
+('DR-002', 'drill', 'Highland Mine', 'Contoso Mining', 95.0, 55.0, 11200, '2025-04-25', 'operational', '2025-04-14 08:00:00'),
+('LD-001', 'loader', 'Olympic Dam', 'Contoso Engineering', 82.0, 70.0, 7800, '2025-06-15', 'operational', '2025-04-14 08:00:00'),
+('DZ-001', 'dozer', 'Northern Basin', 'Contoso Mining', 90.0, 60.0, 13500, '2025-05-01', 'operational', '2025-04-14 08:00:00'),
+('HT-004', 'haul_truck', 'Highland Mine', 'Contoso Mining', 98.0, 35.0, 14200, '2025-04-18', 'warning', '2025-04-14 08:00:00');
 ```
 
-> **Verify:** Run `SELECT COUNT(*) FROM cimic.projects.financials` (expect 10) and `SELECT COUNT(*) FROM cimic.equipment.equipment_telemetry` (expect 10).
+> **Verify:** Run `SELECT COUNT(*) FROM workshop.projects.financials` (expect 10) and `SELECT COUNT(*) FROM workshop.equipment.equipment_telemetry` (expect 10).
 
 **Safety Incidents** — HSE incident records across all divisions:
 
 ```sql
-CREATE OR REPLACE TABLE cimic.safety.incidents (
+CREATE OR REPLACE TABLE workshop.safety.incidents (
     incident_id STRING,
     incident_date DATE,
     site_name STRING,
@@ -266,20 +268,20 @@ CREATE OR REPLACE TABLE cimic.safety.incidents (
     status STRING
 );
 
-INSERT INTO cimic.safety.incidents VALUES
-('INC-2025-001', '2025-01-15', 'Sydney Metro West', 'CPB Contractors', 'Slip/Trip/Fall', 'Minor', 'Worker tripped on unsecured cable in tunnel section B', 1, 0, 'Poor housekeeping', 'Cable management audit implemented', 'closed'),
-('INC-2025-002', '2025-02-03', 'Bowen Basin', 'Thiess', 'Vehicle Interaction', 'Serious', 'Near-miss between haul truck HT-002 and light vehicle at intersection 4', 0, 0, 'Inadequate traffic management', 'Intersection redesigned with barrier separation', 'closed'),
-('INC-2025-003', '2025-02-20', 'Mount Pleasant', 'Thiess', 'Equipment Failure', 'Moderate', 'Excavator EX-002 hydraulic line failure during digging operation', 0, 3.0, 'Deferred maintenance', 'Maintenance schedule reviewed and accelerated', 'closed'),
-('INC-2025-004', '2025-03-08', 'Melbourne Metro Tunnel', 'CPB Contractors', 'Falling Object', 'Minor', 'Small concrete fragment fell from formwork during pour', 0, 0, 'Formwork inspection missed', 'Pre-pour checklist updated with mandatory sign-off', 'closed'),
-('INC-2025-005', '2025-03-22', 'Olympic Dam', 'Sedgman', 'Chemical Exposure', 'Moderate', 'Worker exposed to processing chemical due to PPE glove tear', 1, 2.0, 'PPE degradation not detected', 'PPE inspection frequency increased to start of each shift', 'open'),
-('INC-2025-006', '2025-04-01', 'Bowen Basin', 'Thiess', 'Heat Stress', 'Minor', 'Two workers reported heat stress symptoms during afternoon shift', 2, 0.5, 'Inadequate hydration breaks', 'Mandatory hydration breaks every 45 minutes when temp > 35C', 'open'),
-('INC-2025-007', '2025-04-10', 'WestConnex Tunnel', 'CPB Contractors', 'Noise Exposure', 'Minor', 'Noise level exceeded 85dB in section C without adequate signage', 0, 0, 'Missing signage after equipment change', 'Noise monitoring automated with real-time alerts', 'open');
+INSERT INTO workshop.safety.incidents VALUES
+('INC-2025-001', '2025-01-15', 'Sydney Metro West', 'Contoso Build', 'Slip/Trip/Fall', 'Minor', 'Worker tripped on unsecured cable in tunnel section B', 1, 0, 'Poor housekeeping', 'Cable management audit implemented', 'closed'),
+('INC-2025-002', '2025-02-03', 'Northern Basin', 'Contoso Mining', 'Vehicle Interaction', 'Serious', 'Near-miss between haul truck HT-002 and light vehicle at intersection 4', 0, 0, 'Inadequate traffic management', 'Intersection redesigned with barrier separation', 'closed'),
+('INC-2025-003', '2025-02-20', 'Riverside Dam', 'Contoso Mining', 'Equipment Failure', 'Moderate', 'Excavator EX-002 hydraulic line failure during digging operation', 0, 3.0, 'Deferred maintenance', 'Maintenance schedule reviewed and accelerated', 'closed'),
+('INC-2025-004', '2025-03-08', 'Melbourne Metro Tunnel', 'Contoso Build', 'Falling Object', 'Minor', 'Small concrete fragment fell from formwork during pour', 0, 0, 'Formwork inspection missed', 'Pre-pour checklist updated with mandatory sign-off', 'closed'),
+('INC-2025-005', '2025-03-22', 'Olympic Dam', 'Contoso Engineering', 'Chemical Exposure', 'Moderate', 'Worker exposed to processing chemical due to PPE glove tear', 1, 2.0, 'PPE degradation not detected', 'PPE inspection frequency increased to start of each shift', 'open'),
+('INC-2025-006', '2025-04-01', 'Northern Basin', 'Contoso Mining', 'Heat Stress', 'Minor', 'Two workers reported heat stress symptoms during afternoon shift', 2, 0.5, 'Inadequate hydration breaks', 'Mandatory hydration breaks every 45 minutes when temp > 35C', 'open'),
+('INC-2025-007', '2025-04-10', 'Metro Tunnel Bore', 'Contoso Build', 'Noise Exposure', 'Minor', 'Noise level exceeded 85dB in section C without adequate signage', 0, 0, 'Missing signage after equipment change', 'Noise monitoring automated with real-time alerts', 'open');
 ```
 
 **Procurement Materials** — supplier pricing, lead times, availability:
 
 ```sql
-CREATE OR REPLACE TABLE cimic.procurement.materials (
+CREATE OR REPLACE TABLE workshop.procurement.materials (
     material_id STRING,
     material_name STRING,
     category STRING,
@@ -293,24 +295,24 @@ CREATE OR REPLACE TABLE cimic.procurement.materials (
     availability STRING
 );
 
-INSERT INTO cimic.procurement.materials VALUES
+INSERT INTO workshop.procurement.materials VALUES
 ('MAT-001', 'Structural Steel (Grade 350)', 'Steel', 'BlueScope Steel', 2850.00, 'tonne', 21, '2025-03-15', 500, 'increasing', 'good'),
 ('MAT-002', 'Ready-Mix Concrete (40 MPa)', 'Concrete', 'Hanson Australia', 285.00, 'cubic_meter', 3, '2025-04-10', 2000, 'stable', 'good'),
 ('MAT-003', 'Diesel Fuel (Industrial Grade)', 'Fuel', 'Shell Australia', 1.85, 'litre', 1, '2025-04-12', 500000, 'increasing', 'good'),
 ('MAT-004', 'Reinforcement Bar (N12)', 'Steel', 'InfraBuild', 1650.00, 'tonne', 14, '2025-03-28', 800, 'stable', 'moderate'),
 ('MAT-005', 'Shotcrete Mix', 'Concrete', 'Sika Australia', 320.00, 'cubic_meter', 5, '2025-04-05', 1500, 'stable', 'good'),
 ('MAT-006', 'Explosives (ANFO)', 'Site Consumables', 'Orica', 950.00, 'tonne', 7, '2025-04-08', 200, 'stable', 'good'),
-('MAT-007', 'Tunnel Liner Segments', 'Precast', 'CPB Precast Facility', 4500.00, 'segment', 28, '2025-03-01', 120, 'stable', 'limited'),
+('MAT-007', 'Tunnel Liner Segments', 'Precast', 'Contoso Build Precast Facility', 4500.00, 'segment', 28, '2025-03-01', 120, 'stable', 'limited'),
 ('MAT-008', 'Geotextile Membrane', 'Geosynthetics', 'Geofabrics Australasia', 12.50, 'square_meter', 10, '2025-03-20', 50000, 'decreasing', 'good'),
 ('MAT-009', 'Caterpillar GET (Ground Engaging Tools)', 'Site Consumables', 'WesTrac', 18500.00, 'set', 14, '2025-04-01', 25, 'increasing', 'moderate'),
 ('MAT-010', 'PPE - Hard Hats (AS/NZS 1801)', 'Safety', 'Blackwoods', 45.00, 'unit', 5, '2025-04-05', 500, 'stable', 'good');
 ```
 
 > **Verify all tables:**
-> - `SELECT COUNT(*) FROM cimic.projects.financials` → expect 10
-> - `SELECT COUNT(*) FROM cimic.equipment.equipment_telemetry` → expect 10
-> - `SELECT COUNT(*) FROM cimic.safety.incidents` → expect 7
-> - `SELECT COUNT(*) FROM cimic.procurement.materials` → expect 10
+> - `SELECT COUNT(*) FROM workshop.projects.financials` → expect 10
+> - `SELECT COUNT(*) FROM workshop.equipment.equipment_telemetry` → expect 10
+> - `SELECT COUNT(*) FROM workshop.safety.incidents` → expect 7
+> - `SELECT COUNT(*) FROM workshop.procurement.materials` → expect 10
 
 #### 3.2.1 Create a Genie Space in Databricks
 
@@ -320,18 +322,18 @@ INSERT INTO cimic.procurement.materials VALUES
 
    | Field | Value |
    |-------|-------|
-   | Name | `CIMIC Project Intelligence` |
-   | SQL Warehouse | `cimic-ai-agent-warehouse` (Pro or Serverless) |
-   | Tables | `cimic.projects.financials`, `cimic.equipment.equipment_telemetry`, `cimic.safety.incidents`, `cimic.procurement.materials` |
+   | Name | `Project Intelligence` |
+   | SQL Warehouse | `ai-agent-warehouse` (Pro or Serverless) |
+   | Tables | `workshop.projects.financials`, `workshop.equipment.equipment_telemetry`, `workshop.safety.incidents`, `workshop.procurement.materials` |
 
-4. Add **General Instructions** to define CIMIC-specific terminology:
+4. Add **General Instructions** to define domain-specific terminology:
 
    ```
    - LTIFR means Lost Time Injury Frequency Rate
    - SPI means Schedule Performance Index (1.0 = on schedule, <1.0 = behind)
    - CPI means Cost Performance Index (1.0 = on budget, <1.0 = over budget)
    - CV% means Cost Variance Percentage
-   - Divisions are: CPB Contractors, Thiess, Sedgman, Pacific Partnerships
+   - Divisions are: Contoso Build, Contoso Mining, Contoso Engineering, Contoso Partnerships
    - All monetary values are in AUD unless specified otherwise
    - "Red status" means the project is at risk or over budget
    ```
@@ -341,49 +343,49 @@ INSERT INTO cimic.procurement.materials VALUES
    ```sql
    -- Question: Show me all red-status projects
    SELECT project_name, division, budget_aud, actual_cost_aud, cost_variance_pct
-   FROM cimic.projects.financials
+   FROM workshop.projects.financials
    WHERE status = 'red'
    ORDER BY cost_variance_pct DESC;
 
    -- Question: What is the average SPI by division?
    SELECT division, ROUND(AVG(spi), 2) as avg_spi, COUNT(*) as project_count
-   FROM cimic.projects.financials
+   FROM workshop.projects.financials
    GROUP BY division
    ORDER BY avg_spi;
 
    -- Question: Which equipment has a warning or critical status?
    SELECT equipment_id, equipment_type, site_name, engine_temp_celsius, status
-   FROM cimic.equipment.equipment_telemetry
+   FROM workshop.equipment.equipment_telemetry
    WHERE status IN ('warning', 'critical')
    ORDER BY status, engine_temp_celsius DESC;
 
    -- Question: What is the average engine temperature by equipment type?
    SELECT equipment_type, ROUND(AVG(engine_temp_celsius), 1) as avg_temp, COUNT(*) as count
-   FROM cimic.equipment.equipment_telemetry
+   FROM workshop.equipment.equipment_telemetry
    GROUP BY equipment_type
    ORDER BY avg_temp DESC;
 
    -- Question: Show me all open safety incidents
    SELECT incident_id, incident_date, site_name, division, incident_type, severity, description
-   FROM cimic.safety.incidents
+   FROM workshop.safety.incidents
    WHERE status = 'open'
    ORDER BY incident_date DESC;
 
    -- Question: Which division has the most safety incidents?
    SELECT division, COUNT(*) as incident_count
-   FROM cimic.safety.incidents
+   FROM workshop.safety.incidents
    GROUP BY division
    ORDER BY incident_count DESC;
 
    -- Question: What materials have increasing price trends?
    SELECT material_name, category, supplier, unit_price_aud, unit, price_trend
-   FROM cimic.procurement.materials
+   FROM workshop.procurement.materials
    WHERE price_trend = 'increasing'
    ORDER BY unit_price_aud DESC;
 
    -- Question: Show me steel suppliers and pricing
    SELECT material_name, supplier, unit_price_aud, unit, lead_time_days, availability
-   FROM cimic.procurement.materials
+   FROM workshop.procurement.materials
    WHERE category = 'Steel'
    ORDER BY unit_price_aud DESC;
    ```
@@ -422,7 +424,7 @@ Microsoft Entra ID (your registered app)
     │  scoped to Azure Databricks resource)
     ▼
 Azure Databricks (validates Entra ID token)
-    │ (identifies user as alice@cimic.com.au)
+    │ (identifies user as alice@contoso.com)
     ▼
 Unity Catalog (enforces Alice's permissions + row filters)
 ```
@@ -432,7 +434,7 @@ Unity Catalog (enforces Alice's permissions + row filters)
 For OAuth Identity Passthrough to work, the users who access the Foundry agent must also exist in the Databricks workspace. Azure Databricks auto-syncs Entra ID identities when using Azure-managed workspaces, but verify this is working:
 
 1. In the Databricks workspace, go to **Workspace admin** → **Users**
-2. Confirm that your workshop users appear (e.g., `alice@cimic.com.au`, `bob@cimic.com.au`)
+2. Confirm that your workshop users appear (e.g., `alice@contoso.com`, `bob@contoso.com`)
 3. If users are missing:
    - **Automatic:** Users are added automatically on first access if "Auto add users" is enabled (default for Azure-managed workspaces). Each user can simply visit the workspace URL once.
    - **SCIM provisioning (recommended for production):** Configure in [Entra ID](https://entra.microsoft.com) → **Enterprise applications** → find your Databricks workspace → **Provisioning** → Enable automatic provisioning. This syncs users and groups continuously.
@@ -483,7 +485,7 @@ Create an app registration in Microsoft Entra ID that Foundry will use to reques
 
    | Field | Value |
    |-------|-------|
-   | Name | `cimic-genie-data` |
+   | Name | `genie-data` |
    | Remote MCP Server endpoint | `https://adb-<workspace-id>.azuredatabricks.net/api/2.0/mcp/genie/<genie_space_id>` |
    | Authentication | **OAuth Identity Passthrough** |
 
@@ -543,7 +545,7 @@ Each user must grant consent the **first time** they use the agent with the Geni
    > "This agent needs to connect to Azure Databricks on your behalf. [Open consent]"
 
 4. Click **"Open consent"** — a new browser window opens showing the **Microsoft Entra ID consent page**
-5. Sign in with your Entra ID credentials (e.g., `alice@cimic.com.au`)
+5. Sign in with your Entra ID credentials (e.g., `alice@contoso.com`)
 6. Review the permissions requested (you'll see `user_impersonation` for Azure Databricks) and click **Approve**
 7. The browser shows a confirmation dialog — close it and return to Foundry
 8. Re-send the query — the agent now calls Genie using your token
@@ -606,18 +608,18 @@ Results returned → only data Alice is authorised to see
 | User signs in but gets "Access denied" | User not added to the Databricks workspace | Add the user to the workspace (see Step 1 above) |
 | Consent prompt reappears frequently | Refresh token revoked or Conditional Access policy | Check Entra ID sign-in logs; verify no CA policy blocks token refresh |
 | "AADSTS65001" error code | Consent not granted or revoked | User re-consents; admin may need to pre-approve |
-| Agent returns empty results after consent | User has no permissions on the tables in Unity Catalog | Grant `SELECT` on `cimic.*` tables (or relevant schemas) to the user/group |
+| Agent returns empty results after consent | User has no permissions on the tables in Unity Catalog | Grant `SELECT` on `workshop.*` tables (or relevant schemas) to the user/group |
 
 #### 3.2.4 Test the Integration
 
-Try these CIMIC-specific queries in the agent chat:
+Try these domain-specific queries in the agent chat:
 
 ```
-Show me all red-status projects in the CPB Contractors division.
+Show me all red-status projects in the Contoso Build division.
 ```
 
 ```
-What's the average cost overrun percentage across all Thiess projects?
+What's the average cost overrun percentage across all Contoso Mining projects?
 ```
 
 ```
@@ -629,7 +631,7 @@ Are there any equipment units with critical or warning status?
 ```
 
 ```
-Show me all open safety incidents across CIMIC.
+Show me all open safety incidents across all divisions.
 ```
 
 ```
@@ -640,26 +642,26 @@ Which materials have increasing price trends? Show supplier and pricing.
 
 #### 3.2.5 Configure Row-Level Security (RLS) in Unity Catalog
 
-A key CIMIC requirement is **division-level data isolation** — a CPB Contractors user should only see CPB projects, while a Thiess user sees only Thiess data. Unity Catalog **row filters** enforce this automatically, and because the Genie MCP connection uses OAuth Identity Passthrough, the same filters apply when querying through the Foundry agent.
+A key requirement is **division-level data isolation** — a Contoso Build user should only see Contoso Build projects, while a Contoso Mining user sees only Contoso Mining data. Unity Catalog **row filters** enforce this automatically, and because the Genie MCP connection uses OAuth Identity Passthrough, the same filters apply when querying through the Foundry agent.
 
 ##### Step A — Create Entra ID Security Groups
 
-Create groups in Microsoft Entra ID that map to CIMIC divisions. These groups will be referenced in Unity Catalog row filters.
+Create groups in Microsoft Entra ID that map to divisions. These groups will be referenced in Unity Catalog row filters.
 
 1. Open [Microsoft Entra admin centre](https://entra.microsoft.com) → **Groups** → **All groups**
 2. Click **+ New group** and create the following:
 
    | Group Name | Type | Description |
    |------------|------|-------------|
-   | `Group-A` | Security | CPB Contractors division users |
-   | `Group-B` | Security | Thiess division users |
-   | `Group-C` | Security | Sedgman division users |
+   | `Group-A` | Security | Contoso Build division users |
+   | `Group-B` | Security | Contoso Mining division users |
+   | `Group-C` | Security | Contoso Engineering division users |
    | `Group-Executives` | Security | C-suite / cross-division access |
 
 3. Add workshop participants to the appropriate groups:
-   - Add `alice@cimic.com.au` to `Group-A`
-   - Add `bob@cimic.com.au` to `Group-B`
-   - Add `carol@cimic.com.au` to `Group-Executives`
+   - Add `alice@contoso.com` to `Group-A`
+   - Add `bob@contoso.com` to `Group-B`
+   - Add `carol@contoso.com` to `Group-Executives`
 
 > **Workshop shortcut:** If you only have one or two test accounts, add one to `Group-A` and another to `Group-B` to demonstrate the difference.
 
@@ -671,7 +673,7 @@ Unity Catalog needs to recognise these Entra ID groups.
 2. Verify your Entra ID groups are synced via SCIM or manual assignment:
    - If **SCIM provisioning** is configured (recommended for production), groups sync automatically
    - If not, click **Add group** → search for each `Group-*` group and add it
-3. Assign each group to your workspace: **Workspaces** → `dbw-cimic-workshop` → **Permissions** → add each group with **User** workspace access
+3. Assign each group to your workspace: **Workspaces** → `dbw-workshop` → **Permissions** → add each group with **User** workspace access
 
 ##### Step C — Create a Row Filter Function
 
@@ -679,39 +681,39 @@ Row filters in Unity Catalog use a **SQL function** that returns `TRUE` for rows
 
 ```sql
 -- Create a schema for security functions
-CREATE SCHEMA IF NOT EXISTS cimic.security;
+CREATE SCHEMA IF NOT EXISTS workshop.security;
 
 -- Row filter function: returns TRUE if the user belongs to the matching
 -- division group, OR if the user is in the Executives group (full access)
-CREATE OR REPLACE FUNCTION cimic.security.division_filter(division_value STRING)
+CREATE OR REPLACE FUNCTION workshop.security.division_filter(division_value STRING)
 RETURNS BOOLEAN
 RETURN
   -- Executives see all divisions
   IS_ACCOUNT_GROUP_MEMBER('Group-Executives')
   -- Division users see only their own data
-  OR (division_value = 'CPB Contractors' AND IS_ACCOUNT_GROUP_MEMBER('Group-A'))
-  OR (division_value = 'Thiess'           AND IS_ACCOUNT_GROUP_MEMBER('Group-B'))
-  OR (division_value = 'Sedgman'          AND IS_ACCOUNT_GROUP_MEMBER('Group-C'));
+  OR (division_value = 'Contoso Build' AND IS_ACCOUNT_GROUP_MEMBER('Group-A'))
+  OR (division_value = 'Contoso Mining'           AND IS_ACCOUNT_GROUP_MEMBER('Group-B'))
+  OR (division_value = 'Contoso Engineering'          AND IS_ACCOUNT_GROUP_MEMBER('Group-C'));
 ```
 
 > **How it works:** `IS_ACCOUNT_GROUP_MEMBER()` checks the Entra ID identity of the current user (passed through via OAuth) against account-level groups. No user mapping table is needed.
 
-##### Step D — Apply Row Filters to CIMIC Tables
+##### Step D — Apply Row Filters to Tables
 
 Attach the filter function to each table's `division` column:
 
 ```sql
 -- Project financials: filter by division
-ALTER TABLE cimic.projects.financials
-  SET ROW FILTER cimic.security.division_filter ON (division);
+ALTER TABLE workshop.projects.financials
+  SET ROW FILTER workshop.security.division_filter ON (division);
 
 -- Equipment telemetry: filter by division
-ALTER TABLE cimic.equipment.equipment_telemetry
-  SET ROW FILTER cimic.security.division_filter ON (division);
+ALTER TABLE workshop.equipment.equipment_telemetry
+  SET ROW FILTER workshop.security.division_filter ON (division);
 
 -- Safety incidents: filter by division
-ALTER TABLE cimic.safety.incidents
-  SET ROW FILTER cimic.security.division_filter ON (division);
+ALTER TABLE workshop.safety.incidents
+  SET ROW FILTER workshop.security.division_filter ON (division);
 
 -- Procurement materials: no division column, so no row filter needed
 -- (all users can see all materials — this is shared reference data)
@@ -723,26 +725,26 @@ ALTER TABLE cimic.safety.incidents
 
 Run these verification queries as different users to confirm the filters work:
 
-1. **As a CPB user** (`alice@cimic.com.au` — member of `Group-A`):
+1. **As a Contoso Build user** (`alice@contoso.com` — member of `Group-A`):
 
    ```sql
-   SELECT project_name, division, status FROM cimic.projects.financials;
+   SELECT project_name, division, status FROM workshop.projects.financials;
    ```
 
-   *Expected:* Only rows where `division = 'CPB Contractors'` are returned (5 projects).
+   *Expected:* Only rows where `division = 'Contoso Build'` are returned (5 projects).
 
-2. **As a Thiess user** (`bob@cimic.com.au` — member of `Group-B`):
+2. **As a Contoso Mining user** (`bob@contoso.com` — member of `Group-B`):
 
    ```sql
-   SELECT project_name, division, status FROM cimic.projects.financials;
+   SELECT project_name, division, status FROM workshop.projects.financials;
    ```
 
-   *Expected:* Only rows where `division = 'Thiess'` are returned (3 projects).
+   *Expected:* Only rows where `division = 'Contoso Mining'` are returned (3 projects).
 
-3. **As an Executive** (`carol@cimic.com.au` — member of `Group-Executives`):
+3. **As an Executive** (`carol@contoso.com` — member of `Group-Executives`):
 
    ```sql
-   SELECT project_name, division, status FROM cimic.projects.financials;
+   SELECT project_name, division, status FROM workshop.projects.financials;
    ```
 
    *Expected:* All 10 projects returned (Executives see everything).
@@ -753,7 +755,7 @@ Run these verification queries as different users to confirm the filters work:
 
 Equipment telemetry is the best table for demonstrating RLS because the results are visually distinct per division. Use this query as the primary RLS test:
 
-**As a Group-A user** (e.g., member of `Group-A` = CPB Contractors):
+**As a Group-A user** (e.g., member of `Group-A` = Contoso Build):
 
 ```
 Provide a summary of equipment telemetry metrics by division, including the total fleet count,
@@ -770,7 +772,7 @@ SELECT
   SUM(CASE WHEN status = 'maintenance' THEN 1 ELSE 0 END) AS under_maintenance,
   SUM(CASE WHEN status = 'warning' THEN 1 ELSE 0 END) AS warning_status,
   SUM(CASE WHEN status = 'critical' THEN 1 ELSE 0 END) AS critical_status
-FROM cimic.equipment.equipment_telemetry
+FROM workshop.equipment.equipment_telemetry
 GROUP BY division;
 ```
 
@@ -778,18 +780,18 @@ GROUP BY division;
 
 | division | total_fleet | operational | under_maintenance | warning_status | critical_status |
 |----------|-------------|-------------|-------------------|----------------|-----------------|
-| CPB Contractors | ~1,250 | ~1,000 | ~63 | ~125 | ~63 |
+| Contoso Build | ~1,250 | ~1,000 | ~63 | ~125 | ~63 |
 
-**Only one row** — CPB Contractors. The user cannot see Thiess or Sedgman data.
+**Only one row** — Contoso Build. The user cannot see Contoso Mining or Contoso Engineering data.
 
 *Expected result for Group-Executives user:*
 
 | division | total_fleet | operational | under_maintenance | warning_status | critical_status |
 |----------|-------------|-------------|-------------------|----------------|-----------------|
-| CPB Contractors | ~1,250 | ~1,000 | ~63 | ~125 | ~63 |
-| Thiess | ~1,250 | ~1,000 | ~63 | ~125 | ~63 |
-| Sedgman | ~1,250 | ~1,000 | ~63 | ~125 | ~63 |
-| Pacific Partnerships | ~1,250 | ~1,000 | ~63 | ~125 | ~63 |
+| Contoso Build | ~1,250 | ~1,000 | ~63 | ~125 | ~63 |
+| Contoso Mining | ~1,250 | ~1,000 | ~63 | ~125 | ~63 |
+| Contoso Engineering | ~1,250 | ~1,000 | ~63 | ~125 | ~63 |
+| Contoso Partnerships | ~1,250 | ~1,000 | ~63 | ~125 | ~63 |
 
 **All four divisions** visible. This is the clearest demo of RLS — same question, different results based on group membership.
 
@@ -799,39 +801,39 @@ GROUP BY division;
 
 Now test that the same row filters are enforced when querying via the Foundry agent's Genie MCP tool.
 
-1. **Sign in to Foundry as the CPB user** (`alice@cimic.com.au`)
+1. **Sign in to Foundry as the Contoso Build user** (`alice@contoso.com`)
 2. Open the agent and ask:
 
    ```
    Show me all projects and their status.
    ```
 
-   *Expected:* The agent returns only CPB Contractors projects:
+   *Expected:* The agent returns only Contoso Build projects:
 
    | Project | Division | Status |
    |---------|----------|--------|
-   | Sydney Metro West - Station Fit-Out | CPB Contractors | green |
-   | Inland Rail - Narrabri to North Star | CPB Contractors | amber |
-   | WestConnex M4-M5 Link Tunnels | CPB Contractors | red |
-   | Melbourne Metro Tunnel | CPB Contractors | green |
-   | Pacific Highway Upgrade - Coffs Harbour | CPB Contractors | green |
+   | Sydney Metro West - Station Fit-Out | Contoso Build | green |
+   | Inland Rail - Narrabri to North Star | Contoso Build | amber |
+   | Metro Tunnel Link Tunnels | Contoso Build | red |
+   | Melbourne Metro Tunnel | Contoso Build | green |
+   | Pacific Highway Upgrade - Coffs Harbour | Contoso Build | green |
 
-3. **Sign in to Foundry as the Thiess user** (`bob@cimic.com.au`)
+3. **Sign in to Foundry as the Contoso Mining user** (`bob@contoso.com`)
 4. Ask the same question:
 
    ```
    Show me all projects and their status.
    ```
 
-   *Expected:* The agent returns only Thiess projects:
+   *Expected:* The agent returns only Contoso Mining projects:
 
    | Project | Division | Status |
    |---------|----------|--------|
-   | Bowen Basin Resource Expansion | Thiess | green |
-   | Mount Pleasant Operations | Thiess | red |
-   | Carmichael Rail Network | Thiess | red |
+   | Northern Basin Resource Expansion | Contoso Mining | green |
+   | Riverside Dam Operations | Contoso Mining | red |
+   | Highland Mine Rail Network | Contoso Mining | red |
 
-5. **Sign in as the Executive** (`carol@cimic.com.au`) and verify all 10 projects are returned.
+5. **Sign in as the Executive** (`carol@contoso.com`) and verify all 10 projects are returned.
 
 > **Key takeaway:** No configuration was needed on the Foundry side — the agent, system prompt, and Genie tool are identical for all users. Division-level isolation is enforced entirely by Unity Catalog row filters + OAuth Identity Passthrough. The Foundry agent inherits the user's Databricks permissions automatically.
 
@@ -841,7 +843,7 @@ For fields that should be partially hidden (e.g., exact budget figures for non-e
 
 ```sql
 -- Create a masking function: non-executives see rounded figures only
-CREATE OR REPLACE FUNCTION cimic.security.mask_budget(budget_value DOUBLE)
+CREATE OR REPLACE FUNCTION workshop.security.mask_budget(budget_value DOUBLE)
 RETURNS DOUBLE
 RETURN
   CASE
@@ -850,8 +852,8 @@ RETURN
   END;
 
 -- Apply to the budget column
-ALTER TABLE cimic.projects.financials
-  ALTER COLUMN budget_aud SET MASK cimic.security.mask_budget;
+ALTER TABLE workshop.projects.financials
+  ALTER COLUMN budget_aud SET MASK workshop.security.mask_budget;
 ```
 
 With this mask:
@@ -865,7 +867,7 @@ With this mask:
 This is the critical security advantage of the MCP approach:
 
 ```
-User (Entra ID: alice@cimic.com.au)
+User (Entra ID: alice@contoso.com)
     │
     ▼ (signs into Foundry with Entra ID)
 Foundry Agent
@@ -880,8 +882,8 @@ Genie → SQL Warehouse → Unity Catalog
 Only returns data Alice is authorised to see
 ```
 
-- A CPB project manager sees **only CPB data** (enforced by the row filter configured in step 3.2.5)
-- A Thiess division head sees **only Thiess data**
+- A Contoso Build project manager sees **only Contoso Build data** (enforced by the row filter configured in step 3.2.5)
+- A Contoso Mining division head sees **only Contoso Mining data**
 - An Executive group member sees **all divisions**
 - No shared service account or PAT token — each user's permissions are enforced individually
 - **No Foundry-side configuration needed for RLS** — it is enforced entirely in Unity Catalog. The Foundry agent, system prompt, and Genie tool connection are identical for all users.
@@ -998,8 +1000,8 @@ GRANT EXTERNAL USE SCHEMA ON SCHEMA {catalog}.procurement TO `{sp_client_id}`;
 
 | Environment | SP Client ID | Catalog |
 |-------------|-------------|---------|
-| Dev | `5319dcfd-60d3-4bce-9d26-7e9a6dd81503` | `cimic` |
-| Prod | `8924f20b-eb17-4713-8123-dda701e54eab` | `cimic_prod` |
+| Dev | `<your-service-principal-id>` | `workshop` |
+| Prod | `8924f20b-eb17-4713-8123-dda701e54eab` | `workshop_prod` |
 
 ##### Common Errors
 
@@ -1036,14 +1038,14 @@ Before mirroring will work, a Fabric admin must enable these tenant settings:
    | Tenant ID | Your Entra tenant ID |
    | Client ID | SP Application (Client) ID from step 3.4.0 |
    | Client Secret | SP secret value from step 3.4.0 |
-   | Catalog | `cimic` (or `cimic_prod` for production) |
+   | Catalog | `workshop` (or `workshop_prod` for production) |
 
 5. Select schemas and tables to mirror:
 
    | Schema | Tables |
    |--------|--------|
-   | `cimic.projects` | `financials`, `milestones`, `resources` |
-   | `cimic.equipment` | `equipment_telemetry`, `production_output` |
+   | `workshop.projects` | `financials`, `milestones`, `resources` |
+   | `workshop.equipment` | `equipment_telemetry`, `production_output` |
 
 6. Enable **"Automatically sync future catalog changes"** (on by default)
 7. Click **Create**
@@ -1066,7 +1068,7 @@ After creation, Fabric provisions:
        status,
        budget_aud,
        actual_cost_aud
-   FROM cimic.projects.financials
+   FROM workshop.projects.financials
    ORDER BY budget_aud DESC;
    ```
 
@@ -1074,9 +1076,9 @@ After creation, Fabric provisions:
 
 > **⚠️ RLS does NOT propagate from Databricks to Fabric.** Unity Catalog row filters (section 3.3.5) are enforced when querying through Databricks (Genie, SQL Warehouse, notebooks). Fabric mirroring bypasses these filters because the SP reads data at the storage level. To enforce division-level isolation in Fabric, you must configure **OneLake Security roles** separately. See [`fabric/docs/fabric-mirroring-auth-permissions-rls-guide.md`](../fabric/docs/fabric-mirroring-auth-permissions-rls-guide.md) Section 8 for all 11 role definitions.
 
-#### 3.4.2b Configure OneLake Security RLS (CPB Contractors Demo)
+#### 3.4.2b Configure OneLake Security RLS (Contoso Build Demo)
 
-For the workshop demo, we create one set of OneLake Security roles for **Group-A (CPB Contractors)** to demonstrate Fabric-side RLS on mirrored data.
+For the workshop demo, we create one set of OneLake Security roles for **Group-A (Contoso Build)** to demonstrate Fabric-side RLS on mirrored data.
 
 ##### Prerequisites
 
@@ -1091,52 +1093,52 @@ For the workshop demo, we create one set of OneLake Security roles for **Group-A
 
 > **⚠️ Workspace Admins, Members, and Contributors bypass OneLake Security.** Only users with the **Viewer** workspace role are restricted by RLS. Ensure demo test users (e.g., Vinoth) have the **Viewer** role.
 
-##### Create the CPB Contractors Roles
+##### Create the Contoso Build Roles
 
 Navigate to: **Mirrored DB** → **Manage OneLake security** → **New role**
 
 Create these 3 roles (one per table with a `division` column):
 
-**Role 1: `RoleCPBFinance`**
+**Role 1: `RoleBuildFinance`**
 
 | Setting | Value |
 |---------|-------|
-| Role name | `RoleCPBFinance` |
+| Role name | `RoleBuildFinance` |
 | Assign Entra group | `Group-A` |
 | Table access | `financials_f` |
 
 Row security expression:
 ```sql
-SELECT * FROM projects.financials_f WHERE division = 'CPB Contractors'
+SELECT * FROM projects.financials_f WHERE division = 'Contoso Build'
 ```
 
-**Role 2: `RoleCPBSafety`**
+**Role 2: `RoleBuildSafety`**
 
 | Setting | Value |
 |---------|-------|
-| Role name | `RoleCPBSafety` |
+| Role name | `RoleBuildSafety` |
 | Assign Entra group | `Group-A` |
 | Table access | `incidents_f` |
 
 Row security expression:
 ```sql
-SELECT * FROM safety.incidents_f WHERE division = 'CPB Contractors'
+SELECT * FROM safety.incidents_f WHERE division = 'Contoso Build'
 ```
 
-**Role 3: `RoleCPBEquipment`**
+**Role 3: `RoleBuildEquipment`**
 
 | Setting | Value |
 |---------|-------|
-| Role name | `RoleCPBEquipment` |
+| Role name | `RoleBuildEquipment` |
 | Assign Entra group | `Group-A` |
 | Table access | `equipment_telemetry_f` |
 
 Row security expression:
 ```sql
-SELECT * FROM equipment.equipment_telemetry_f WHERE division = 'CPB Contractors'
+SELECT * FROM equipment.equipment_telemetry_f WHERE division = 'Contoso Build'
 ```
 
-> **Why 3 roles?** OneLake Security roles are scoped to **one table per role**. Each role applies one row security expression. Since the `division` column exists on 3 tables (financials, incidents, equipment_telemetry), you need 3 roles for CPB Contractors. Procurement (materials) has no `division` column — all users see all materials.
+> **Why 3 roles?** OneLake Security roles are scoped to **one table per role**. Each role applies one row security expression. Since the `division` column exists on 3 tables (financials, incidents, equipment_telemetry), you need 3 roles for Contoso Build. Procurement (materials) has no `division` column — all users see all materials.
 
 > **Syntax:** OneLake RLS rules use a full `SELECT` statement: `SELECT * FROM {schema}.{table} WHERE {predicate}`. Supported operators: `=`, `<>`, `>`, `<`, `IN`, `AND`, `OR`, `NOT`.
 
@@ -1145,11 +1147,11 @@ SELECT * FROM equipment.equipment_telemetry_f WHERE division = 'CPB Contractors'
 Sign in as a **Group-A Viewer** user (e.g., Vinoth) and query the mirrored data via the SQL Analytics Endpoint:
 
 ```sql
--- Should return ONLY CPB Contractors rows
+-- Should return ONLY Contoso Build rows
 SELECT division, COUNT(*) as row_count
 FROM equipment.equipment_telemetry_f
 GROUP BY division;
--- Expected: one row — 'CPB Contractors'
+-- Expected: one row — 'Contoso Build'
 ```
 
 If you see all 4 divisions, check:
@@ -1162,18 +1164,18 @@ If you see all 4 divisions, check:
 A Fabric Data Agent provides a natural language interface over your mirrored data — similar to Genie but within the Fabric ecosystem.
 
 1. In your Fabric workspace, click **+ New item** → search for **"Data agent"**
-2. Name it: `CIMIC Project Intelligence Agent`
+2. Name it: `Project Intelligence Agent`
 3. **Select data source** → choose the mirrored lakehouse (or SQL Analytics Endpoint)
 4. Select the tables to make available to the AI:
-   - `cimic.projects.financials`
-   - `cimic.equipment.equipment_telemetry`
-   - `cimic.safety.incidents`
-   - `cimic.procurement.materials`
+   - `workshop.projects.financials`
+   - `workshop.equipment.equipment_telemetry`
+   - `workshop.safety.incidents`
+   - `workshop.procurement.materials`
 
 5. **Add instructions** (similar to Genie):
 
    ```
-   This data source contains CIMIC Group operational data mirrored from Azure Databricks.
+   This data source contains operational data mirrored from Azure Databricks.
 
    Key tables:
    - financials: Project budget, actuals, cost variance, SPI for all divisions
@@ -1184,7 +1186,7 @@ A Fabric Data Agent provides a natural language interface over your mirrored dat
    - LTIFR = Lost Time Injury Frequency Rate
    - SPI = Schedule Performance Index (1.0 = on schedule)
    - CPI = Cost Performance Index (1.0 = on budget)
-   - Divisions: CPB Contractors, Thiess, Sedgman, Pacific Partnerships
+   - Divisions: Contoso Build, Contoso Mining, Contoso Engineering, Contoso Partnerships
    - All costs in AUD
    ```
 
@@ -1192,8 +1194,8 @@ A Fabric Data Agent provides a natural language interface over your mirrored dat
 
    | Question | SQL |
    |----------|-----|
-   | Show red-status projects | `SELECT project_name, division, cost_variance_pct FROM cimic.projects.financials WHERE status = 'red'` |
-   | Average SPI by division | `SELECT division, AVG(spi) as avg_spi FROM cimic.projects.financials GROUP BY division` |
+   | Show red-status projects | `SELECT project_name, division, cost_variance_pct FROM workshop.projects.financials WHERE status = 'red'` |
+   | Average SPI by division | `SELECT division, AVG(spi) as avg_spi FROM workshop.projects.financials GROUP BY division` |
 
 7. **Test** the agent in the built-in chat panel
 8. Click **Publish** to generate a published URL
@@ -1205,7 +1207,7 @@ Once published, the Fabric Data Agent can be consumed in multiple ways:
 **In Copilot in Power BI:**
 1. Open Power BI → click the **Copilot** button (left nav)
 2. Click **"Add items for better results"** → **Data agents**
-3. Select `CIMIC Project Intelligence Agent`
+3. Select `Project Intelligence Agent`
 4. Ask questions directly in Copilot
 
 **In Power BI Reports (Direct Lake):**
@@ -1232,7 +1234,7 @@ When you combine both options, the architecture looks like this:
 
 ```
                 Azure Databricks
-                Unity Catalog (cimic.*)
+                Unity Catalog (workshop.*)
                     │           │
         ┌───────────┘           └───────────┐
         │                                   │
@@ -1263,7 +1265,7 @@ When you combine both options, the architecture looks like this:
 
 ---
 
-## 3.4 Recommendation for CIMIC
+## 3.4 Recommendation
 
 For the workshop, we recommend using **both approaches** for different purposes:
 
@@ -1279,7 +1281,7 @@ In Module 5, we'll implement the **Genie MCP** approach as the primary Databrick
 
 ---
 
-## 3.5 Security Considerations for CIMIC
+## 3.5 Security Considerations
 
 | Concern | Genie MCP Mitigation | Fabric Mirroring Mitigation |
 |---------|---------------------|-----------------------------|
@@ -1294,7 +1296,7 @@ In Module 5, we'll implement the **Genie MCP** approach as the primary Databrick
 
 ## 3.6 Additional Databricks MCP Servers (Beyond Genie)
 
-If your CIMIC use case goes beyond Genie, Databricks provides additional managed MCP servers you can add to your Foundry agent using the same portal flow:
+If your use case goes beyond Genie, Databricks provides additional managed MCP servers you can add to your Foundry agent using the same portal flow:
 
 | MCP Server | Use Case | Endpoint Pattern |
 |------------|----------|-----------------|
@@ -1312,13 +1314,13 @@ These can be combined — for example, a single Foundry agent could have:
 ## Checkpoint ✓
 
 - [ ] Understand both Databricks-to-Foundry integration patterns (Genie MCP and Fabric Mirroring)
-- [ ] Genie Space created in Databricks with CIMIC tables and instructions
+- [ ] Genie Space created in Databricks with workshop tables and instructions
 - [ ] Genie MCP tool added to Foundry agent via Custom MCP with Entra ID app registration (Option 1)
 - [ ] OAuth Identity Passthrough (Custom) authorised and tested with per-user consent
 - [ ] Row-level security configured in Unity Catalog with division-based row filters (step 3.2.5)
 - [ ] RLS verified end-to-end: different Entra ID users see only their division's data through the agent
 - [ ] (If Fabric available) Unity Catalog mirrored into Fabric, Fabric Data Agent created (Option 2)
-- [ ] Security implications understood for CIMIC production deployment
+- [ ] Security implications understood for production deployment
 
 ---
 

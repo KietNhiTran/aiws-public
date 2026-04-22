@@ -1,7 +1,7 @@
-# Module 5: End-to-End Demo — CIMIC Project Intelligence Agent
+# Module 5: End-to-End Demo — Project Intelligence Agent
 
 **Duration:** 30 minutes (Led Demo) / 45 minutes (Hands-On)  
-**Objective:** Wire together everything from Modules 2–4 into a complete CIMIC Project Intelligence Agent. No new infrastructure to build — this module is about configuring the agent, running realistic test scenarios, and evaluating results.
+**Objective:** Wire together everything from Modules 2–4 into a complete Project Intelligence Agent. No new infrastructure to build — this module is about configuring the agent, running realistic test scenarios, and evaluating results.
 
 > **Prerequisites:** You must have completed Modules 2–4. All tools and data sources should be deployed and tested individually before starting this module.
 
@@ -15,7 +15,7 @@ Every component was built in a previous module — this module connects them int
 
 | Tool | Source Module | What It Provides |
 |------|-------------|-----------------|
-| File Search | Module 2 | CIMIC policies, governance framework lookups |
+| File Search | Module 2 | Company policies, governance framework lookups |
 | Code Interpreter | Module 2 | EVM calculations, charts, trend analysis |
 | Databricks Genie MCP | Module 3 | Live queries across 4 tables (financials, equipment, safety, procurement) |
 | Web Search | Module 4 | Market prices, industry news, weather |
@@ -30,10 +30,10 @@ Before configuring the complete agent, verify that every tool from Modules 2–4
 
 | # | Tool | Quick Test | Expected Result | Status |
 |---|------|-----------|-----------------|--------|
-| 1 | **File Search** (Module 2) | "What is CIMIC's Zero Harm policy?" | Returns content from cimic-safety-policy-2025.md | ☐ |
+| 1 | **File Search** (Module 2) | "What is the company's Zero Harm policy?" | Returns content from safety-policy-2025.md | ☐ |
 | 2 | **Code Interpreter** (Module 2) | "Calculate EVM: BAC=$50M, EV=$22M, AC=$25M" | Returns SPI, CPI, EAC values | ☐ |
-| 3 | **Genie MCP — Financials** (Module 3) | "How many projects are in red status?" | Returns 3 (WestConnex, Mount Pleasant, Carmichael) | ☐ |
-| 4 | **Genie MCP — Equipment** (Module 3) | "Which equipment has critical status?" | Returns EX-002 (Mount Pleasant excavator) | ☐ |
+| 3 | **Genie MCP — Financials** (Module 3) | "How many projects are in red status?" | Returns 3 (Metro Tunnel, Riverside Dam, Highland Mine) | ☐ |
+| 4 | **Genie MCP — Equipment** (Module 3) | "Which equipment has critical status?" | Returns EX-002 (Riverside Dam excavator) | ☐ |
 | 5 | **Genie MCP — Safety** (Module 3) | "Show me all open safety incidents" | Returns 3 open incidents | ☐ |
 | 6 | **Genie MCP — Procurement** (Module 3) | "What materials have increasing prices?" | Returns Steel, Diesel, GET | ☐ |
 | 7 | **Web Search** (Module 4) | "What is the current steel price in Australia?" | Returns current market data | ☐ |
@@ -49,12 +49,12 @@ Before configuring the complete agent, verify that every tool from Modules 2–4
 In the Foundry portal, open your agent and set the following system prompt:
 
 ```
-You are the CIMIC Project Intelligence Advisor — an AI assistant for CIMIC Group, 
-Australia's largest infrastructure and construction company. CIMIC operates through 
-its divisions: CPB Contractors (construction & infrastructure), Thiess (contract services), 
-Sedgman (mineral processing), and Pacific Partnerships (public-private partnerships).
+You are the Project Intelligence Advisor — an AI assistant for Contoso Construction Group, 
+a leading infrastructure and construction company. The company operates through 
+its divisions: Contoso Build (construction & infrastructure), Contoso Mining (contract mining), 
+Contoso Engineering (mineral processing), and Contoso Partnerships (public-private partnerships).
 
-Your role is to help CIMIC project managers, executives, and safety officers make 
+Your role is to help project managers, executives, and safety officers make 
 data-driven decisions by querying live operational data.
 
 ## Available Data Sources
@@ -70,7 +70,7 @@ data-driven decisions by querying live operational data.
 
 3. **Safety** (Databricks via Genie)
    - Incident records: type, severity, root cause, corrective actions, status
-   - CIMIC is committed to Zero Harm — always prioritise safety data accuracy
+   - The company is committed to Zero Harm — always prioritise safety data accuracy
    - Use for: incident reporting, trend analysis, division comparisons
 
 4. **Procurement** (Databricks via Genie)
@@ -78,7 +78,7 @@ data-driven decisions by querying live operational data.
    - Use for: cost estimates, supplier comparisons, supply chain analysis
 
 5. **Internal Documents** (File Search)
-   - CIMIC Safety Policy 2025 (Zero Harm framework)
+   - Safety Policy 2025 (Zero Harm framework)
    - Project Governance Framework (stage gates, RAG definitions, escalation protocols)
 
 6. **Market Intelligence** (Web Search)
@@ -104,7 +104,7 @@ data-driven decisions by querying live operational data.
 
 ### Code Interpreter — ONLY for post-processing, NEVER for data retrieval
 - NEVER use Code Interpreter to retrieve, query, or look up data. It has NO access 
-  to CIMIC databases or project data.
+  to company databases or project data.
 - ONLY use Code Interpreter AFTER you have already retrieved data from Databricks 
   Genie or other tools.
 - Use Code Interpreter for: calculations (EVM, cost estimates), generating charts, 
@@ -112,7 +112,7 @@ data-driven decisions by querying live operational data.
 - Correct workflow: Databricks Genie (get data) → Code Interpreter (calculate/chart)
 
 ### File Search — for internal policy and governance documents
-- Use File Search for: CIMIC Safety Policy 2025 (Zero Harm framework), Project 
+- Use File Search for: Safety Policy 2025 (Zero Harm framework), Project 
   Governance Framework (stage gates, RAG definitions, escalation protocols), and 
   any other uploaded internal documents.
 - Use for questions about policies, procedures, thresholds, definitions, compliance 
@@ -135,7 +135,7 @@ data-driven decisions by querying live operational data.
 
 - Always cite which data source(s) you used for each piece of information
 - Use Australian English and AUD for all currency values
-- When discussing safety, reference CIMIC's Zero Harm policy and be thorough
+- When discussing safety, reference the company's Zero Harm policy and be thorough
 - For financial data, calculate and present EVM metrics (SPI, CPI, EAC, VAC) when relevant
 - If data from multiple sources is needed, query all relevant sources before synthesising
 - Present tables for structured data, and offer to generate charts for trends
@@ -173,7 +173,7 @@ Run each scenario and observe how the agent orchestrates multiple tools.
 
 **Prompt:**
 ```
-Give me an executive summary of CIMIC's current project portfolio. 
+Give me an executive summary of the current project portfolio. 
 Include:
 - Overall portfolio status (green/amber/red breakdown)
 - Total budget vs total actuals across all projects
@@ -190,11 +190,11 @@ Include:
 
 ---
 
-### Scenario 2: Site Deep Dive — Bowen Basin
+### Scenario 2: Site Deep Dive — Northern Basin
 
 **Prompt:**
 ```
-I'm visiting the Bowen Basin site tomorrow. Brief me on:
+I'm visiting the Northern Basin site tomorrow. Brief me on:
 1. Project financial performance (is it on budget/schedule?)
 2. Equipment health status
 3. Recent safety incidents at this site
@@ -202,10 +202,10 @@ I'm visiting the Bowen Basin site tomorrow. Brief me on:
 ```
 
 **Expected tool calls:**
-1. **Genie MCP** → Bowen Basin project financials
-2. **Genie MCP** → equipment telemetry for Bowen Basin
-3. **Genie MCP** → safety incidents at Bowen Basin
-4. **Web Search** → weather for Bowen Basin, Queensland
+1. **Genie MCP** → Northern Basin project financials
+2. **Genie MCP** → equipment telemetry for Northern Basin
+3. **Genie MCP** → safety incidents at Northern Basin
+4. **Web Search** → weather for Northern Basin
 
 **What to look for:** Agent makes 4 tool calls across 2 tool types and weaves results into a coherent site briefing. Should flag HT-002 (warning status) and the heat stress incident.
 
@@ -233,7 +233,7 @@ with current market rates and flag if we're overpaying.
 
 **Prompt:**
 ```
-Analyse the safety incident trend across all CIMIC divisions this year. 
+Analyse the safety incident trend across all divisions this year. 
 Which division has the most incidents? What are the common root causes? 
 Show me a chart of incidents by type and severity.
 Compare this with our Zero Harm policy requirements.
@@ -244,7 +244,7 @@ Compare this with our Zero Harm policy requirements.
 2. **Code Interpreter** → generate chart of incidents by type, severity, division
 3. **File Search** → retrieve Zero Harm policy for comparison
 
-**What to look for:** Agent retrieves all 7 incidents, creates a visual chart, then references specific sections of the Zero Harm policy. Thiess should appear as having the most incidents (3). CPB Contractors also has 3 but across more sites.
+**What to look for:** Agent retrieves all 7 incidents, creates a visual chart, then references specific sections of the Zero Harm policy. Contoso Mining should appear as having the most incidents (3). Contoso Build also has 3 but across more sites.
 
 ---
 
@@ -261,7 +261,7 @@ incidents should we be aware of?
 1. **Genie MCP** → equipment telemetry (all equipment, sorted by risk indicators)
 2. **Genie MCP** → safety incidents filtered for equipment-related types
 
-**What to look for:** Agent identifies EX-002 (critical status, 18,200 hours, 115.8°C engine temp, overdue maintenance) and correlates with INC-2025-003 (excavator hydraulic failure at Mount Pleasant). Should recommend immediate maintenance action.
+**What to look for:** Agent identifies EX-002 (critical status, 18,200 hours, 115.8°C engine temp, overdue maintenance) and correlates with INC-2025-003 (excavator hydraulic failure at Riverside Dam). Should recommend immediate maintenance action.
 
 ---
 
@@ -270,16 +270,16 @@ incidents should we be aware of?
 **Prompt:**
 ```
 What are the major Australian infrastructure projects announced for 2025-2026? 
-Which ones align with CIMIC's capabilities? Compare with our current project 
+Which ones align with the company's capabilities? Compare with our current project 
 portfolio to identify any gaps or opportunities.
 ```
 
 **Expected tool calls:**
 1. **Web Search** → Australian infrastructure projects 2025-2026
-2. **Genie MCP** → current CIMIC project portfolio
-3. **File Search** → governance framework for CIMIC's capability description
+2. **Genie MCP** → current project portfolio
+3. **File Search** → governance framework for capability description
 
-**What to look for:** Agent combines external market intelligence with internal portfolio data and CIMIC's documented capabilities.
+**What to look for:** Agent combines external market intelligence with internal portfolio data and the company's documented capabilities.
 
 ---
 
@@ -300,20 +300,20 @@ Foundry evaluation uses an **LLM-as-judge** pattern: a separate model (GPT-4o) s
 
 ### 5.5.2 Create an Evaluation Dataset
 
-Create a JSONL file with CIMIC-specific test cases. For **agent target evaluation**, each row needs a `query` field (what to ask the agent). Add a `ground_truth` field to provide the expected answer rubric so the LLM judge can score against it. When you upload this file in the portal, the field mapping step will auto-detect `query` → Query and `ground_truth` → Ground truth.
+Create a JSONL file with workshop-specific test cases. For **agent target evaluation**, each row needs a `query` field (what to ask the agent). Add a `ground_truth` field to provide the expected answer rubric so the LLM judge can score against it. When you upload this file in the portal, the field mapping step will auto-detect `query` → Query and `ground_truth` → Ground truth.
 
-Save the following as `cimic-eval-dataset.jsonl`:
+Save the following as `eval-dataset.jsonl`:
 
 ```jsonl
-{"query": "How many CIMIC projects are currently in red status?", "ground_truth": "Should query Databricks via Genie MCP. Should return exactly 3 red-status projects: WestConnex, Mount Pleasant, and Carmichael. Should present data in a table with project name, division, and cost variance."}
-{"query": "Show me all open safety incidents across CIMIC divisions.", "ground_truth": "Should query safety incidents via Genie MCP. Should return 3 open incidents (INC-2025-005, INC-2025-006, INC-2025-007). Should include site name, severity, and description for each."}
-{"query": "What is CIMIC's Zero Harm policy and current LTIFR target?", "ground_truth": "Should use File Search to retrieve the safety policy document. Should state Zero Harm commitment, LTIFR target < 1.0, and FY2024 actual of 0.82. Should not hallucinate metrics."}
+{"query": "How many projects are currently in red status?", "ground_truth": "Should query Databricks via Genie MCP. Should return exactly 3 red-status projects: Metro Tunnel, Riverside Dam, and Highland Mine. Should present data in a table with project name, division, and cost variance."}
+{"query": "Show me all open safety incidents across all divisions.", "ground_truth": "Should query safety incidents via Genie MCP. Should return 3 open incidents (INC-2025-005, INC-2025-006, INC-2025-007). Should include site name, severity, and description for each."}
+{"query": "What is the company's Zero Harm policy and current LTIFR target?", "ground_truth": "Should use File Search to retrieve the safety policy document. Should state Zero Harm commitment, LTIFR target < 1.0, and FY2024 actual of 0.82. Should not hallucinate metrics."}
 {"query": "What is the current market price of structural steel in Australia?", "ground_truth": "Should use Web Search to retrieve current market data. Should provide a price per tonne in AUD with a cited source. Should not fabricate a specific price from training data."}
-{"query": "Which equipment is at highest risk of failure?", "ground_truth": "Should query equipment telemetry via Genie MCP. Should identify EX-002 as critical (18,200 hours, 115.8C engine temp, overdue maintenance at Mount Pleasant). Should recommend maintenance action."}
+{"query": "Which equipment is at highest risk of failure?", "ground_truth": "Should query equipment telemetry via Genie MCP. Should identify EX-002 as critical (18,200 hours, 115.8C engine temp, overdue maintenance at Riverside Dam). Should recommend maintenance action."}
 {"query": "I need a cost estimate for 200 tonnes of structural steel for Melbourne Metro Tunnel. Compare with market rates.", "ground_truth": "Should query procurement materials via Genie MCP for internal steel pricing ($2,850/tonne). Should use Web Search for current market prices. Should use Code Interpreter to calculate total cost (approx $570,000 internal) and present a comparison."}
-{"query": "Analyse safety incidents by division — which has the most? Show a chart.", "ground_truth": "Should query all safety incidents via Genie MCP. Should use Code Interpreter to generate a chart. Should identify CPB Contractors and Thiess as having 3 incidents each. Should reference Zero Harm policy via File Search."}
-{"query": "Brief me on the Bowen Basin site — financials, equipment, safety, and weather.", "ground_truth": "Should make multiple tool calls: Genie MCP for financials (green status, $650M budget), Genie MCP for equipment (flag HT-002 warning), Genie MCP for safety incidents (INC-2025-002 vehicle interaction, INC-2025-006 heat stress), and Web Search for weather. Should synthesise into a coherent briefing."}
-{"query": "What cost variance triggers a red flag on CIMIC projects?", "ground_truth": "Should use File Search to retrieve the governance framework. Should state that cost variance < -10% triggers red status. Should reference the governance framework document, not hallucinate thresholds."}
+{"query": "Analyse safety incidents by division — which has the most? Show a chart.", "ground_truth": "Should query all safety incidents via Genie MCP. Should use Code Interpreter to generate a chart. Should identify Contoso Build and Contoso Mining as having 3 incidents each. Should reference Zero Harm policy via File Search."}
+{"query": "Brief me on the Northern Basin site — financials, equipment, safety, and weather.", "ground_truth": "Should make multiple tool calls: Genie MCP for financials (green status, $650M budget), Genie MCP for equipment (flag HT-002 warning), Genie MCP for safety incidents (INC-2025-002 vehicle interaction, INC-2025-006 heat stress), and Web Search for weather. Should synthesise into a coherent briefing."}
+{"query": "What cost variance triggers a red flag on projects?", "ground_truth": "Should use File Search to retrieve the governance framework. Should state that cost variance < -10% triggers red status. Should reference the governance framework document, not hallucinate thresholds."}
 {"query": "What materials have increasing price trends and what are their current suppliers?", "ground_truth": "Should query procurement materials via Genie MCP. Should return Steel (BlueScope, $2,850/t), Diesel (Shell, $1.85/L), and GET (WesTrac, $18,500/set) — all with 'increasing' price trend."}
 ```
 
@@ -334,7 +334,7 @@ The Foundry portal provides a **6-step wizard** to create and run evaluations. F
 #### Step 2 — Data
 
 1. Click **Add new dataset**
-2. Upload your `cimic-eval-dataset.jsonl` file (CSV format is also supported)
+2. Upload your `eval-dataset.jsonl` file (CSV format is also supported)
 3. A preview of the first few rows displays on the right — verify your `query` and `ground_truth` fields are visible
 4. Alternatively, use **Synthetic dataset generation** if you want the platform to auto-generate test queries (requires a model with Responses API capability)
 5. Click **Next**
@@ -360,7 +360,7 @@ Click **Next**.
 
 #### Step 4 — Configure Agents
 
-1. Your agent (e.g., `cimic-project-advisor-2`) appears with a **Config required** badge
+1. Your agent (e.g., `project-advisor-2`) appears with a **Config required** badge
 2. Click **Configure** to open the **Add custom prompt** dialog
 3. The **DEVELOPER** message field is required — you must enter a prompt before you can save. This message is prepended to each query as a developer-role instruction. Enter the following:
 
@@ -377,7 +377,7 @@ Always cite which data source you used. Use Australian English and AUD for curre
 
 Select the evaluators (testing criteria). Microsoft Foundry provides three categories:
 
-**Agent evaluators** (recommended for CIMIC):
+**Agent evaluators** (recommended for this workshop):
 
 | Evaluator | What It Measures | Output |
 |-----------|-----------------|--------|
@@ -409,7 +409,7 @@ Click **Next**.
 
 #### Step 6 — Review
 
-1. Enter an evaluation name: `cimic-agent-eval-v1`
+1. Enter an evaluation name: `agent-eval-v1`
 2. Review all settings (target, dataset, field mapping, agent config, evaluators)
 3. Click **Submit**
 
@@ -425,10 +425,10 @@ Once the evaluation completes:
 
 **What to look for:**
 
-| Evaluator | Target | CIMIC-Specific Checks |
+| Evaluator | Target | Workshop-Specific Checks |
 |-----------|--------|----------------------|
 | `Task Adherence` | 100% Pass | Does the agent cite data sources as instructed? Use AUD? |
-| `Task Completion` | ≥ 80% Pass | Does the agent fully complete multi-part queries (e.g., Bowen Basin briefing)? |
+| `Task Completion` | ≥ 80% Pass | Does the agent fully complete multi-part queries (e.g., Northern Basin briefing)? |
 | `Intent Resolution` | ≥ 80% Pass | Does the agent correctly understand what's being asked? |
 | `Tool Call Accuracy` | ≥ 80% Pass | Does the agent use Genie MCP (not Web Search) for internal data? |
 | `Coherence` | ≥ 4.0 / 5.0 | Are responses well-structured with logical flow? |
@@ -470,7 +470,7 @@ python run_evaluation.py
 | File | Description |
 |------|-------------|
 | [`run_evaluation.py`](../src/eval/run_evaluation.py) | Main script — uploads dataset, configures evaluators, runs evaluation |
-| [`cimic-eval-dataset.jsonl`](../src/eval/cimic-eval-dataset.jsonl) | 10 CIMIC test cases (same as Section 5.5.2) |
+| [`eval-dataset.jsonl`](../src/eval/eval-dataset.jsonl) | 10 workshop test cases (same as Section 5.5.2) |
 | [`.env.example`](../src/eval/.env.example) | Environment variable template |
 | [`requirements.txt`](../src/eval/requirements.txt) | Python dependencies (`azure-ai-projects>=2.0.0`) |
 
@@ -498,7 +498,7 @@ For production, run evaluation after every system prompt change and track scores
 
 ## 5.6 Production Readiness Checklist
 
-Before deploying this agent to CIMIC production users:
+Before deploying this agent to production users:
 
 ### Security
 
@@ -530,7 +530,7 @@ Before deploying this agent to CIMIC production users:
 
 ---
 
-## 5.7 Next Steps for CIMIC
+## 5.7 Next Steps
 
 ### Expand Data Sources
 
@@ -538,13 +538,13 @@ Before deploying this agent to CIMIC production users:
 |----------------|-----------|----------|
 | SAP ERP (live) | Custom Function | All |
 | HSEQ database | Azure AI Search | All |
-| BIM models | Azure AI Search | CPB Contractors |
-| Fleet management (live telemetry) | MCP / Custom Function | Thiess |
+| BIM models | Azure AI Search | Contoso Build |
+| Fleet management (live telemetry) | MCP / Custom Function | Contoso Mining |
 | SharePoint documents | Azure AI Search | All |
 
 ### Advanced Features
 
-1. **Multi-agent orchestration**: Separate agents per division (CPB, Thiess, Sedgman) coordinated by a master agent
+1. **Multi-agent orchestration**: Separate agents per division (Contoso Build, Contoso Mining, Contoso Engineering) coordinated by a master agent
 2. **Automated reporting**: Schedule the agent to generate weekly project reports via Azure Logic Apps
 3. **Teams integration**: Deploy as a Microsoft Teams bot for project managers
 4. **Mobile access**: Expose agent via Power Platform for field workers on tablets
@@ -556,14 +556,14 @@ To avoid ongoing Azure charges, delete the workshop resources:
 
 ```bash
 # Delete the entire resource group (removes ALL workshop resources)
-az group delete --name rg-cimic-ai-workshop --yes --no-wait
+az group delete --name rg-ai-workshop --yes --no-wait
 ```
 
 ---
 
 ## 🎉 Workshop Complete!
 
-You've built a **CIMIC Project Intelligence Agent** that demonstrates how Microsoft Foundry Agent Service orchestrates multiple data sources:
+You've built a **Project Intelligence Agent** that demonstrates how Microsoft Foundry Agent Service orchestrates multiple data sources:
 
 | Module | What You Built |
 |--------|---------------|
@@ -573,7 +573,7 @@ You've built a **CIMIC Project Intelligence Agent** that demonstrates how Micros
 | **Module 4** | Web Search + toolkit overview (AI Search, Custom Functions concepts) |
 | **Module 5** | Wired it all together, ran real scenarios, evaluated the agent |
 
-The agent seamlessly queries **Databricks** (4 tables via Genie MCP), **uploaded documents** (File Search), **the web** (Web Search), and **generates calculations and charts** (Code Interpreter) — delivering a complete project intelligence experience for CIMIC Group.
+The agent seamlessly queries **Databricks** (4 tables via Genie MCP), **uploaded documents** (File Search), **the web** (Web Search), and **generates calculations and charts** (Code Interpreter) — delivering a complete project intelligence experience for Contoso Construction Group.
 
 ---
 

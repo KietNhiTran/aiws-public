@@ -20,7 +20,7 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
-databricks/scripts/fabric_config.json
+
 # Environment variables / secrets
 .env
 .env.local
@@ -37,6 +37,9 @@ build/
 .venv/
 venv/
 env/
+
+# Logs
+logs/
 
 # IDE
 .vscode/

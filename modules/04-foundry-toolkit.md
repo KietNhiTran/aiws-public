@@ -3,7 +3,7 @@
 **Duration:** 60 minutes  
 **Objective:** Explore the full range of built-in tools available in Microsoft Foundry Agent Service. Enable **Web Search** for use in the E2E demo, and walk through **Azure AI Search**, **Azure Functions**, **OpenAPI Tools**, and **Agent-to-Agent (A2A)** as concepts for future extensibility.
 
-> **Recap:** In Module 2, you configured **File Search** (CIMIC policies & governance docs) and **Code Interpreter** (EVM calculations). In Module 3, you connected **Databricks Genie via MCP** (project financials, equipment telemetry, safety incidents, procurement). This module rounds out your understanding of the toolkit.
+> **Recap:** In Module 2, you configured **File Search** (company policies & governance docs) and **Code Interpreter** (EVM calculations). In Module 3, you connected **Databricks Genie via MCP** (project financials, equipment telemetry, safety incidents, procurement). This module rounds out your understanding of the toolkit.
 
 ---
 
@@ -56,13 +56,13 @@ Here's the full picture of tools available in Foundry Agent Service.
 ### What It Does
 Gives the agent access to **real-time web search** via Bing. Useful for retrieving current information not available in your internal data sources. The Foundry Portal provides a simple **Web Search** toggle that handles everything — no additional Azure resources required.
 
-### CIMIC Use Cases
+### Use Cases
 
 | Use Case | Example |
 |----------|---------|
 | Material pricing | "What is the current market price of structural steel in Australia?" |
 | Regulatory changes | "Any recent changes to Australian building codes for high-rise construction?" |
-| Weather impact | "Is there a severe weather warning for the Bowen Basin region this week?" |
+| Weather impact | "Is there a severe weather warning for the Northern Basin region this week?" |
 | Industry news | "Latest news about Australian infrastructure projects" |
 | Competitor analysis | "What major projects has Lendlease won recently?" |
 
@@ -70,7 +70,7 @@ Gives the agent access to **real-time web search** via Bing. Useful for retrievi
 
 #### Step 1: Enable Web Search on Your Agent
 
-1. Open your agent `cimic-project-advisor` in the Agent Service
+1. Open your agent `project-advisor` in the Agent Service
 2. In the agent configuration panel, find the **Tools** section
 3. Under **Most popular**, locate **Web search**
 4. Flip the toggle to **On**
@@ -86,7 +86,7 @@ That's it — Web Search is now active on your agent. No Azure resource creation
 | Current market prices | Yes | No |
 | Internal project data | No | Yes (Genie MCP) |
 | Regulatory updates | Yes | No (unless you index regulations) |
-| CIMIC internal policies | No | Yes (File Search) |
+| Internal company policies | No | Yes (File Search) |
 | General industry news | Yes | No |
 | Weather conditions for site visits | Yes | No |
 
@@ -104,7 +104,7 @@ What is the current market price of structural steel in Australia?
 ```
 
 ```
-Are there any severe weather warnings for the Bowen Basin region this week?
+Are there any severe weather warnings for the Northern Basin region this week?
 ```
 
 ### Web Search vs. Bing Grounding — When to Upgrade
@@ -155,7 +155,7 @@ Connects the agent to an existing **Azure AI Search index** for enterprise-grade
 | Real-time updates | Manual upload | Indexer-based (auto-refresh) |
 | Best for | Policies, governance docs | Large document collections, structured data search |
 
-### CIMIC Use Cases
+### Use Cases
 
 | Use Case | Index Source | Why AI Search? |
 |----------|-------------|----------------|
@@ -173,12 +173,12 @@ Connects the agent to an existing **Azure AI Search index** for enterprise-grade
 
 ### Example: Safety Incident Search Index
 
-In a production CIMIC deployment, you would create a safety incidents index with semantic search enabled. This allows queries like "find incidents similar to hydraulic failure on excavators" — something structured SQL cannot do.
+In a production deployment, you would create a safety incidents index with semantic search enabled. This allows queries like "find incidents similar to hydraulic failure on excavators" — something structured SQL cannot do.
 
 ```python
 # Conceptual example — index schema for safety incidents
 index = SearchIndex(
-    name="cimic-safety-incidents",
+    name="safety-incidents",
     fields=[
         SimpleField(name="incident_id", type="Edm.String", key=True),
         SimpleField(name="incident_date", type="Edm.DateTimeOffset", filterable=True),
@@ -189,7 +189,7 @@ index = SearchIndex(
     ],
     semantic_search=SemanticSearch(
         configurations=[SemanticConfiguration(
-            name="cimic-safety-semantic",
+            name="safety-semantic",
             prioritized_fields=SemanticPrioritizedFields(
                 content_fields=[
                     SemanticField(field_name="description"),
@@ -201,9 +201,9 @@ index = SearchIndex(
 )
 ```
 
-**Key insight:** Azure AI Search excels at **finding similar items by description** — something structured database queries (including Genie MCP) can't do. For CIMIC, this means a project manager reporting a new safety incident can instantly find similar past incidents across all divisions and sites.
+**Key insight:** Azure AI Search excels at **finding similar items by description** — something structured database queries (including Genie MCP) can't do. This means a project manager reporting a new safety incident can instantly find similar past incidents across all divisions and sites.
 
-> **When to add this to the agent:** If CIMIC has large document collections (10K+ docs) in SharePoint, Blob Storage, or an HSE database that would benefit from semantic search, Azure AI Search is the right tool. For this workshop, File Search handles the policy docs and Genie MCP handles the structured data.
+> **When to add this to the agent:** If your organization has large document collections (10K+ docs) in SharePoint, Blob Storage, or an HSE database that would benefit from semantic search, Azure AI Search is the right tool. For this workshop, File Search handles the policy docs and Genie MCP handles the structured data.
 
 ---
 
@@ -236,7 +236,7 @@ The agent's decision is based on:
 
 ```
 ✅ GOOD function name: "searchSafetyIncidents"
-✅ GOOD description: "Search CIMIC HSE safety incidents from the HSE Management System. 
+✅ GOOD description: "Search HSE safety incidents from the HSE Management System. 
    Returns incident records including severity, root cause, corrective actions, 
    and investigation status. Use for safety queries, incident analysis, and compliance checks."
 
@@ -244,7 +244,7 @@ The agent's decision is based on:
 ❌ BAD description: "Gets data from the database"
 ```
 
-### CIMIC Custom Function Ideas (Future)
+### Custom Function Ideas (Future)
 
 | Function | Description | Backend System |
 |----------|-------------|----------------|
@@ -275,22 +275,22 @@ The agent's decision is based on:
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "CIMIC Operational Systems API",
+    "title": "Operations API",
     "version": "1.0.0"
   },
-  "servers": [{ "url": "https://cimic-api.azurewebsites.net/api" }],
+  "servers": [{ "url": "https://<your-api>.azurewebsites.net/api" }],
   "paths": {
     "/safety/incidents": {
       "post": {
         "operationId": "searchSafetyIncidents",
-        "summary": "Search CIMIC HSE safety incidents. Use for structured safety queries.",
+        "summary": "Search HSE safety incidents. Use for structured safety queries.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "site": { "type": "string", "description": "Site name (e.g., Bowen Basin)" },
+                  "site": { "type": "string", "description": "Site name (e.g., Northern Basin)" },
                   "severity": { "type": "string", "enum": ["Minor", "Moderate", "Serious"] },
                   "status": { "type": "string", "enum": ["open", "closed"] }
                 }
@@ -304,7 +304,7 @@ The agent's decision is based on:
 }
 ```
 
-> **When to add this to the agent:** When CIMIC needs to connect to systems that don't have Databricks/MCP integration — SAP ERP, ServiceNow, custom HSE platforms, or any internal REST API. Use **Azure Functions** when you need server-side isolation, async processing, or reusable tools across agents. Use **OpenAPI Tools** when you have an existing REST API with a spec and want the simplest integration path.
+> **When to add this to the agent:** When you need to connect to systems that don't have Databricks/MCP integration — SAP ERP, ServiceNow, custom HSE platforms, or any internal REST API. Use **Azure Functions** when you need server-side isolation, async processing, or reusable tools across agents. Use **OpenAPI Tools** when you have an existing REST API with a spec and want the simplest integration path.
 
 ---
 
@@ -317,13 +317,13 @@ The agent's decision is based on:
 
 > See: [Connect to an A2A agent endpoint from Foundry Agent Service](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/agent-to-agent)
 
-### CIMIC Use Case: Multi-Agent Architecture
+### Use Case: Multi-Agent Architecture
 
-In a production CIMIC deployment, rather than a single agent with many tools, you could build specialist agents:
+In a production deployment, rather than a single agent with many tools, you could build specialist agents:
 
 ```
 ┌─────────────────────────────────────┐
-│  CIMIC Project Intelligence Hub     │
+│  Project Intelligence Hub            │
 │  (Coordinator Agent)                │
 │                                     │
 │  Routes queries via A2A to:         │
@@ -360,7 +360,7 @@ In a production CIMIC deployment, rather than a single agent with many tools, yo
 | Different security boundaries per domain | Hard to manage | ✅ Each agent has own RBAC |
 | Need to update one domain without affecting others | Risky | ✅ Independent deployment |
 
-> **When to consider A2A for CIMIC:** When the single-agent approach starts hitting prompt complexity limits (too many tools, conflicting instructions), or when different teams (HSE, Finance, Procurement) want to own and evolve their agents independently.
+> **When to consider A2A:** When the single-agent approach starts hitting prompt complexity limits (too many tools, conflicting instructions), or when different teams (HSE, Finance, Procurement) want to own and evolve their agents independently.
 
 ---
 
@@ -368,7 +368,7 @@ In a production CIMIC deployment, rather than a single agent with many tools, yo
 
 The following tools are available in Foundry Agent Service but not covered in detail in this workshop. They're listed here so you know what's available for future use.
 
-| Tool | Status | What It Does | CIMIC Relevance |
+| Tool | Status | What It Does | Relevance |
 |------|--------|-------------|------------------|
 | **SharePoint** | Preview | Chat with private documents stored in SharePoint using OBO (On-Behalf-Of) authentication — the agent only sees files the user has permission to access. | High — project docs, HSE records, tender archives likely live in SharePoint. Natural complement to File Search for M365-integrated document access. |
 | **Image Generation** | Preview | Generate images as part of conversations using `gpt-image-1`. Requires both the image model and an LLM orchestrator in the same project. | Medium — site layout diagrams, progress visualization mockups, report illustrations. |
@@ -376,7 +376,7 @@ The following tools are available in Foundry Agent Service but not covered in de
 | **Computer Use** | Preview | Interact with computer systems through their user interfaces (requires `computer-use-preview` model). | Low — interacting with legacy desktop ERP applications that lack APIs. |
 | **Deep Research** | Preview | Multi-step web-based research pipeline using `o3-deep-research` model with Bing Search. Performs extended analysis and reasoning across multiple sources. | Medium — deep-dive research on regulations, tender background, market analysis, competitor intelligence. |
 | **Custom Code Interpreter** | Preview | Customize the Code Interpreter's resources, Python packages, and Container Apps environment. | Medium — pre-install engineering Python libraries (geotechnical, structural calcs) not available in the default sandbox. |
-| **Fabric Data Agent** | Preview | Connect to a Microsoft Fabric data agent for data analysis. | Medium — alternative to Databricks Genie if CIMIC adopts Microsoft Fabric. See Module 3, Option 2. |
+| **Fabric Data Agent** | Preview | Connect to a Microsoft Fabric data agent for data analysis. | Medium — alternative to Databricks Genie if your organization adopts Microsoft Fabric. See Module 3, Option 2. |
 
 > **Source:** [Foundry Agent Service Tool Catalog](https://learn.microsoft.com/azure/foundry/agents/concepts/tool-catalog) and [Tool best practices (region & model support)](https://learn.microsoft.com/azure/foundry/agents/concepts/tool-best-practice)
 
@@ -384,7 +384,7 @@ The following tools are available in Foundry Agent Service but not covered in de
 
 ## 4.7 Tool Comparison Summary
 
-| Tool | Data Source | Setup Module | Used in E2E? | CIMIC Use |
+| Tool | Data Source | Setup Module | Used in E2E? | Use Case |
 |------|-----------|-------------|-------------|-----------|
 | Code Interpreter | Agent-generated Python | Module 2 | ✅ Yes | EVM calcs, charts |
 | File Search | Uploaded documents | Module 2 | ✅ Yes | Policies, governance |
@@ -412,7 +412,7 @@ The following tools are available in Foundry Agent Service but not covered in de
 
 ---
 
-**Next:** [Module 5: End-to-End Demo — CIMIC Project Intelligence Agent](05-e2e-demo.md)
+**Next:** [Module 5: End-to-End Demo — Project Intelligence Agent](05-e2e-demo.md)
 
 ---
 
@@ -434,10 +434,10 @@ Enabling a tool toggle makes the capability *available*, but the LLM relies on t
 
 ### Fix: Updated System Prompt
 
-Replace the **entire system instructions** on your `cimic-project-advisor` agent with the version below. The changes are in the **Data Source Policy** section (three new bullet points marked with `← NEW`):
+Replace the **entire system instructions** on your `project-advisor` agent with the version below. The changes are in the **Data Source Policy** section (three new bullet points marked with `← NEW`):
 
 ```
-You are the CIMIC Project Intelligence Advisor, an AI assistant built for CIMIC Group
+You are the Project Intelligence Advisor, an AI assistant built for Contoso Construction
 project managers and operations teams.
 
 ## Your Role
@@ -448,11 +448,11 @@ project managers and operations teams.
 - Advise on procurement timing and supplier performance
 
 ## Your Knowledge Domain
-- CIMIC Group's current operating companies are ONLY the following:
-  • CPB Contractors (construction)
-  • Thiess (contract services)
-  • Sedgman (mineral processing)
-  • Pacific Partnerships (public-private partnerships)
+- Contoso Construction's operating companies are ONLY the following:
+  • Contoso Build (construction)
+  • Contoso Mining (contract services)
+  • Contoso Engineering (mineral processing)
+  • Contoso Partnerships (public-private partnerships)
 - Do NOT mention former subsidiaries (e.g., UGL) unless the user specifically asks
   about historical company structure
 - Projects span road/rail infrastructure, tunnelling, building construction, and resource operations
@@ -473,7 +473,7 @@ project managers and operations teams.
   Search tool to retrieve up-to-date information from the internet
 - Always cite the web source URL when presenting information from Web Search              ← NEW
 - When the user's question could be answered by both internal documents AND web search,   ← NEW
-  prefer internal documents for CIMIC-specific data and web search for external/public data
+  prefer internal documents for company-specific data and web search for external/public data
 - If no connected tool or document provides the requested data, respond:
   "I don't currently have access to that data. To answer this, I would need
   [specific data source, e.g., a connection to the project financials database]."

@@ -1,6 +1,6 @@
-# CIMIC Agent Evaluation (SDK)
+# Agent Evaluation (SDK)
 
-Runs batch evaluation against the CIMIC Project Intelligence Agent using the Microsoft Foundry SDK. This is the scriptable equivalent of the portal evaluation described in Module 5, Section 5.5.3.
+Runs batch evaluation against the Project Intelligence Agent using the Microsoft Foundry SDK. This is the scriptable equivalent of the portal evaluation described in Module 5, Section 5.5.3.
 
 ## Quick Start
 
@@ -25,7 +25,7 @@ python run_evaluation.py
 ```
 
 The script will:
-1. Upload `cimic-eval-dataset.jsonl` to your Foundry project
+1. Upload `eval-dataset.jsonl` to your Foundry project
 2. Create an evaluation definition with 5 built-in evaluators
 3. Run the evaluation against your agent
 4. Print the evaluation run ID — view results in the Foundry portal
@@ -35,7 +35,7 @@ The script will:
 | File | Description |
 |------|-------------|
 | `run_evaluation.py` | Main evaluation script |
-| `cimic-eval-dataset.jsonl` | 10 CIMIC-specific test cases with ground truth |
+| `eval-dataset.jsonl` | 10 domain-specific test cases with ground truth |
 | `requirements.txt` | Python dependencies |
 | `.env.example` | Environment variable template |
 

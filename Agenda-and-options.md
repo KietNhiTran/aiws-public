@@ -1,4 +1,4 @@
-# CIMIC Foundry AI Workshop 
+# Foundry AI Workshop
 
 ---
 
@@ -6,7 +6,6 @@
 
 | Field | Value |
 |-------|-------|
-| **Customer** | CIMIC Group |
 | **Outcome** | Building Intelligent AI Agents for Infrastructure Operations |
 | **Platform** | Microsoft Foundry Agent Service + Azure Databricks |
 | **Modules** | 5 (Foundry overview and Setup → Agent Build → Databricks → Toolkit → E2E Demo final agent) |
@@ -25,7 +24,7 @@ The workshop lead runs through the entire build while the audience observes on a
 
 | Time | Duration | Activity | Module | Notes |
 |------|----------|----------|--------|-------|
-| 09:00 | 10 min | **Welcome & Introductions** | — | Introductions, agenda, CIMIC scenario context |
+| 09:00 | 10 min | **Welcome & Introductions** | — | Introductions, agenda, scenario context |
 | 09:10 | 40 min | **Foundry Overview & Setup** | [Module 1](modules/01-foundry-setup.md) | Foundry overview (what it is, agent concepts, governance, workshop architecture), create project, deploy model, explain V2 hierarchy. |
 | 09:50 | 40 min | **Build the Agent** | [Module 2](modules/02-build-your-first-agent.md) | Demo: create agent, craft system prompt, add File Search + Code Interpreter, test in playground. Invite audience to suggest test prompts. |
 | 10:30 | 15 min | ☕ **Break** | — | |
@@ -65,7 +64,7 @@ Participants follow each module step-by-step on their own Azure subscriptions or
 ### Pre-Workshop Checklist
 - [ ] Confirm all participants have Azure subscriptions with **Azure AI Owner** or **Contributor** role
 - [ ] Confirm Azure Databricks workspace is provisioned in each participant's subscription (or shared workspace with per-user access)
-- [ ] Pre-create resource group `rg-cimic-ai-workshop` in **Australia East** for each participant (optional — saves 5 min in Module 1)
+- [ ] Pre-create resource group `rg-ai-workshop` in your preferred region for each participant (optional — saves 5 min in Module 1)
 - [ ] Verify **Managed MCP Servers** preview is enabled on the Databricks workspace
 - [ ] Prepare **Grounding with Bing Search** resource (one shared resource is fine — participants connect to it - optional if we don't want to follow this part)
 
@@ -89,7 +88,5 @@ Participants follow each module step-by-step on their own Azure subscriptions or
 
 | Role | Name | Responsibility |
 |------|------|---------------|
-| Workshop Lead | Katherine Tran | Delivers the workshop, runs demos, Foundry AI focus |
-| Workshop Lead | Sajit Gurubacharya | Delivers the workshop, runs demos, Databricks focus |
-| CIMIC Sponsor | Christina Cappelen-Smith| Business context, Team member selection, CIMIC-specific Q&A |
+| Workshop Lead | _Your Name_ | Delivers the workshop, runs demos |
 

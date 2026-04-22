@@ -1,5 +1,5 @@
 /**
- * CIMIC Project Advisor — Chat UI Client
+ * Project Advisor — Chat UI Client
  *
  * Connects to the FastAPI backend which proxies requests to Foundry Agent Service.
  * Uses Server-Sent Events (SSE) for real-time streaming of agent responses.
@@ -526,13 +526,13 @@ function renderMessages(messages) {
     messagesEl.innerHTML = `
       <div class="welcome-message">
         <div class="welcome-icon">🏗️</div>
-        <h2>Welcome to CIMIC Project Advisor</h2>
+        <h2>Welcome to Project Advisor</h2>
         <p>I can help you with project performance insights, financial analysis, safety metrics, and procurement data.</p>
         <div class="suggestions">
-          <button class="suggestion" data-prompt="What is CIMIC's LTIFR target for 2025?">📊 LTIFR target for 2025</button>
+          <button class="suggestion" data-prompt="What is the company's LTIFR target for 2025?">📊 LTIFR target for 2025</button>
           <button class="suggestion" data-prompt="Calculate EVM metrics: budget AUD 450M, actual costs AUD 412M, planned value AUD 420M">💰 EVM calculation</button>
-          <button class="suggestion" data-prompt="What cost variance threshold triggers a red flag on CIMIC projects?">🚩 Cost variance thresholds</button>
-          <button class="suggestion" data-prompt="Summarise CIMIC's safety policy for subcontractor management">🦺 Safety policy summary</button>
+          <button class="suggestion" data-prompt="What cost variance threshold triggers a red flag on projects?">🚩 Cost variance thresholds</button>
+          <button class="suggestion" data-prompt="Summarise the safety policy for subcontractor management">🦺 Safety policy summary</button>
         </div>
       </div>`;
     return;

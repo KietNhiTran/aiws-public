@@ -1,7 +1,7 @@
-# CIMIC Group HSE Policy 2025
+# Contoso Construction Group HSE Policy 2025
 
 ## Zero Harm Commitment
-CIMIC Group is committed to Zero Harm across all operations.
+Contoso Construction Group is committed to Zero Harm across all operations.
 Target: Zero fatalities, Lost Time Injury Frequency Rate (LTIFR) < 1.0
 
 ## Incident Reporting
@@ -10,7 +10,7 @@ Target: Zero fatalities, Lost Time Injury Frequency Rate (LTIFR) < 1.0
 - Critical incidents trigger immediate stop-work authority
 
 ## PPE Requirements
-All personnel on CIMIC sites must wear:
+All personnel on company sites must wear:
 - Hard hat (AS/NZS 1801)
 - Safety glasses (AS/NZS 1337)
 - High-visibility vest (AS/NZS 4602)

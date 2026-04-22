@@ -1,5 +1,5 @@
 """
-CIMIC Project Advisor — Foundry Agent Service (SDK)
+Project Advisor — Foundry Agent Service (SDK)
 
 This is the code-based equivalent of the low-code Prompt Agent built in Module 2.
 Instead of using the Foundry portal, it creates the same agent programmatically
@@ -66,7 +66,7 @@ ASSETS_DIR = Path(__file__).parent / "../../sample-data"
 # System instructions — mirrors the portal-configured prompt from Module 2
 # ---------------------------------------------------------------------------
 SYSTEM_INSTRUCTIONS = """\
-You are the CIMIC Project Intelligence Advisor, an AI assistant built for CIMIC Group
+You are the Project Intelligence Advisor, an AI assistant built for Contoso Construction Group
 project managers and operations teams.
 
 ## Your Role
@@ -77,12 +77,12 @@ project managers and operations teams.
 - Advise on procurement timing and supplier performance
 
 ## Your Knowledge Domain
-- CIMIC Group's current operating companies are ONLY the following:
-  • CPB Contractors (construction)
-  • Thiess (contract services)
-  • Sedgman (mineral processing)
-  • Pacific Partnerships (public-private partnerships)
-- Do NOT mention former subsidiaries (e.g., UGL) unless the user specifically asks
+- Contoso Construction Group's current operating companies are ONLY the following:
+  • Contoso Build (construction)
+  • Contoso Mining (contract services)
+  • Contoso Engineering (mineral processing)
+  • Contoso Partnerships (public-private partnerships)
+- Do NOT mention former subsidiaries unless the user specifically asks
   about historical company structure
 - Projects span road/rail infrastructure, tunnelling, building construction, and resource operations
 - Financial metrics follow Australian construction industry standards (AS/NZS)
@@ -245,7 +245,7 @@ project managers and operations teams.
 
 
 def main() -> None:
-    """Create the CIMIC Project Advisor agent via Foundry Agent Service SDK."""
+    """Create the Project Advisor agent via Foundry Agent Service SDK."""
 
     # ----- Clients --------------------------------------------------------
     project = AIProjectClient(
@@ -256,10 +256,10 @@ def main() -> None:
 
     # ----- 1. Upload documents & create a vector store (File Search) ------
     print("Creating vector store and uploading knowledge-base documents...")
-    vector_store = openai.vector_stores.create(name="CIMICKnowledgeBase")
+    vector_store = openai.vector_stores.create(name="KnowledgeBase")
 
     doc_files = [
-        ASSETS_DIR / "cimic-safety-policy-2025.md",
+        ASSETS_DIR / "safety-policy-2025.md",
         ASSETS_DIR / "project-governance-framework.md",
     ]
     for doc_path in doc_files:
@@ -288,15 +288,15 @@ def main() -> None:
         # create_sharepoint_tool(project),   # SharePoint documents
     ]
 
-    print("\nCreating agent: cimic-project-advisor ...")
+    print("\nCreating agent: project-advisor ...")
     agent = project.agents.create_version(
-        agent_name="cimic-project-advisor-4",
+        agent_name="project-advisor",
         definition=PromptAgentDefinition(
             model=MODEL_DEPLOYMENT_NAME,
             instructions=SYSTEM_INSTRUCTIONS,
             tools=tools,
         ),
-        description="CIMIC Project Intelligence Advisor with File Search and Code Interpreter.",
+        description="Project Intelligence Advisor with File Search and Code Interpreter.",
     )
     print(f"  Agent created — name: {agent.name}, version: {agent.version}")
 
@@ -307,17 +307,17 @@ def main() -> None:
     # Turn 1 — File Search question
     response = openai.responses.create(
         conversation=conversation.id,
-        input="What is CIMIC's LTIFR target for 2025?",
+        input="What is the company's LTIFR target for 2025?",
         extra_body={"agent_reference": {"name": agent.name, "type": "agent_reference"}},
     )
-    print(f"User: What is CIMIC's LTIFR target for 2025?")
+    print(f"User: What is the company's LTIFR target for 2025?")
     print(f"Agent: {response.output_text}\n")
 
     # Turn 2 — Code Interpreter question (follow-up in same conversation)
     response = openai.responses.create(
         conversation=conversation.id,
         input=(
-            "If a CIMIC project has a budget of AUD 450M, actual costs of AUD 412M, "
+            "If a project has a budget of AUD 450M, actual costs of AUD 412M, "
             "and planned value of AUD 420M, calculate the Cost Variance, "
             "Schedule Variance, CPI, and SPI. Show the formulas."
         ),
@@ -329,7 +329,7 @@ def main() -> None:
     # Turn 3 — Governance question
     response = openai.responses.create(
         conversation=conversation.id,
-        input="What cost variance threshold triggers a red flag on CIMIC projects?",
+        input="What cost variance threshold triggers a red flag on projects?",
         extra_body={"agent_reference": {"name": agent.name, "type": "agent_reference"}},
     )
     print(f"User: What cost variance threshold triggers a red flag?")

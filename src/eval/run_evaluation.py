@@ -1,7 +1,7 @@
 """
-CIMIC Agent Evaluation via Microsoft Foundry SDK
+Agent Evaluation via Microsoft Foundry SDK
 
-Runs batch evaluation against the CIMIC Project Intelligence Agent using
+Runs batch evaluation against the Project Intelligence Agent using
 the OpenAI-compatible Evaluations API. Results appear in both the Foundry
 portal dashboard and the API response.
 
@@ -32,12 +32,12 @@ load_dotenv()
 
 ENDPOINT = os.environ["AZURE_AI_PROJECT_ENDPOINT"]
 MODEL_DEPLOYMENT = os.environ.get("JUDGE_MODEL_DEPLOYMENT", "gpt-4o")
-AGENT_NAME = os.environ.get("AGENT_NAME", "cimic-project-advisor")
+AGENT_NAME = os.environ.get("AGENT_NAME", "project-advisor")
 AGENT_VERSION = os.environ.get("AGENT_VERSION", "")  # blank = latest
-DATASET_NAME = os.environ.get("EVAL_DATASET_NAME", "cimic-agent-eval-v1")
+DATASET_NAME = os.environ.get("EVAL_DATASET_NAME", "agent-eval-v1")
 DATASET_VERSION = os.environ.get("EVAL_DATASET_VERSION", "1")
-EVAL_NAME = os.environ.get("EVAL_NAME", "cimic-agent-eval-v1")
-DATASET_PATH = Path(__file__).parent / "cimic-eval-dataset.jsonl"
+EVAL_NAME = os.environ.get("EVAL_NAME", "agent-eval-v1")
+DATASET_PATH = Path(__file__).parent / "eval-dataset.jsonl"
 
 # ---------------------------------------------------------------------------
 # Connect to Foundry

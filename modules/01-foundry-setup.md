@@ -13,14 +13,14 @@ Microsoft Foundry (the current name — formerly Azure AI Foundry / Azure AI Stu
 
 #### Key Capabilities
 
-| Capability | What It Does | How CIMIC Uses It |
+| Capability | What It Does | Industry Example |
 |-----------|-------------|-------------------|
 | **Model Catalog** | Access 1,900+ models — OpenAI, Meta, Mistral, Cohere, and more | Deploy GPT-4o for agent reasoning |
-| **Agent Service** | Low-code and pro-code agent development with built-in tool orchestration | Build the CIMIC Project Intelligence Agent |
+| **Agent Service** | Low-code and pro-code agent development with built-in tool orchestration | Build the Project Intelligence Agent |
 | **Tool Ecosystem** | Built-in tools (File Search, Code Interpreter, Web Search) + MCP server connections | Connect to Databricks data, policy documents, market intelligence |
 | **Evaluation** | Batch evaluation with LLM-as-judge, built-in quality and safety evaluators | Score agent responses for relevance, accuracy, and safety |
 | **Tracing & Observability** | End-to-end trace logging via Azure Monitor and Application Insights | Monitor agent conversations, tool calls, and latency |
-| **Responsible AI** | Content safety filters, prompt shields, groundedness detection | Ensure agent outputs meet CIMIC compliance standards |
+| **Responsible AI** | Content safety filters, prompt shields, groundedness detection | Ensure agent outputs meet compliance standards |
 
 #### Where Foundry Fits in the Microsoft AI Stack
 
@@ -42,7 +42,7 @@ Microsoft Foundry (the current name — formerly Azure AI Foundry / Azure AI Stu
   └───────────┘  └───────────────────────────────────┘
 ```
 
-For CIMIC, Foundry provides a secure, enterprise-grade platform to build AI agents that can access operational data across construction and services divisions.
+Foundry provides a secure, enterprise-grade platform to build AI agents that can access operational data across construction and services divisions.
 
 ---
 
@@ -58,9 +58,9 @@ Traditional BI dashboards and reports require users to know *what* to ask and *w
 | **Reasoning** | Pattern matching / keyword routing | Multi-step reasoning — decides which tools to call and in what order |
 | **Calculations** | None (or pre-built) | Generates and executes code for EVM, trend analysis, what-if scenarios |
 | **Context** | Single data source | Synthesises across multiple sources in one response |
-| **Example** | "What is our safety policy?" → returns a link | "Compare our Bowen Basin safety record against the Zero Harm targets and show a trend chart" → queries incidents, retrieves policy, generates chart |
+| **Example** | "What is our safety policy?" → returns a link | "Compare our Northern Basin safety record against the Zero Harm targets and show a trend chart" → queries incidents, retrieves policy, generates chart |
 
-#### CIMIC Use Cases
+#### Construction Industry Use Cases
 
 | Use Case | Who Benefits | What the Agent Does |
 |----------|-------------|-------------------|
@@ -99,7 +99,7 @@ User Query → Agent (LLM) → Reason → Select Tool(s) → Execute → Synthes
 
 | Tool | Type | Purpose |
 |------|------|---------|
-| **File Search** | Built-in | Search uploaded documents (CIMIC policies, governance frameworks) |
+| **File Search** | Built-in | Search uploaded documents (company policies, governance frameworks) |
 | **Code Interpreter** | Built-in | Run Python code for calculations, charts, data analysis |
 | **Web Search** | Built-in | Retrieve live web data (market prices, news, weather) |
 | **Databricks Genie MCP** | MCP Server | Query structured data in Databricks via natural language → SQL |
@@ -108,13 +108,13 @@ User Query → Agent (LLM) → Reason → Select Tool(s) → Execute → Synthes
 
 ### 1.4 Workshop Architecture
 
-This is building towards the **CIMIC Project Intelligence Agent** — a single agent wired to all four tools:
+This is building towards the **Project Intelligence Agent** — a single agent wired to all four tools:
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                CIMIC Project Intelligence Agent                  │
+│                  Project Intelligence Agent                      │
 │                                                                  │
-│  System Prompt: CIMIC Project Advisor persona                    │
+│  System Prompt: Project Advisor persona                          │
 │  Model: GPT-4o                                                   │
 │                                                                  │
 │  ┌──────────────┐ ┌──────────────┐ ┌────────────────────────┐   │
@@ -126,7 +126,7 @@ This is building towards the **CIMIC Project Intelligence Agent** — a single a
 │                                                                  │
 │  ┌─────────────────────────────────────────────────────────┐     │
 │  │  Databricks Genie MCP                                   │     │
-│  │  Natural Language → SQL across 4 CIMIC datasets         │     │
+│  │  Natural Language → SQL across 4 workshop datasets      │     │
 │  │  (financials, equipment, safety, procurement)           │     │
 │  └─────────────────────────────────────────────────────────┘     │
 └──────────────────────────────────────────────────────────────────┘
@@ -165,7 +165,7 @@ Foundry supports two paths for building agents. This workshop uses the **low-cod
 
 ### 1.6 Enterprise Governance & Security
 
-A key reason to use Foundry (rather than calling OpenAI APIs directly) is the enterprise governance layer. For an organisation like CIMIC with sensitive financial, safety, and operational data, this matters.
+A key reason to use Foundry (rather than calling OpenAI APIs directly) is the enterprise governance layer. For an organisation with sensitive financial, safety, and operational data, this matters.
 
 | Governance Layer | What Foundry Provides |
 |-----------------|-----------------------|
@@ -197,7 +197,7 @@ A key reason to use Foundry (rather than calling OpenAI APIs directly) is the en
 └─────────────────────────────────────────────────────────┘
 ```
 
-> **For CIMIC:** The combination of Entra ID + Unity Catalog means a Thiess user querying the agent only sees Thiess data, while a CPB Contractors user sees CPB data — all through the same agent, with no code changes required.
+> **How It Applies:** The combination of Entra ID + Unity Catalog means a Contoso Mining user querying the agent only sees Contoso Mining data, while a Contoso Build user sees Contoso Build data — all through the same agent, with no code changes required.
 
 ---
 
@@ -230,18 +230,18 @@ When you create a project, the portal **automatically provisions a Foundry resou
 
 1. The project you're working on appears in the **upper-left corner**
 2. Click the **project name** → select **Create new project**
-3. Enter the project name: `cimic-project-intelligence`
+3. Enter the project name: `project-intelligence`
 4. Click **Create project** — or expand **Advanced options** for more control
 
-### Step 3: Advanced Options (Recommended for CIMIC)
+### Step 3: Advanced Options (Recommended)
 
 Expand the advanced options to customise:
 
 | Field | Value |
 |-------|-------|
-| Project name | `cimic-project-intelligence` |
-| Resource group | `rg-cimic-ai-workshop` (create new) |
-| Location | `Australia East` (closest to CIMIC HQ in Sydney) |
+| Project name | `project-intelligence` |
+| Resource group | `rg-ai-workshop` (create new) |
+| Location | *Select the region closest to your location* |
 
 > **Tip:** Create a new resource group specifically for the workshop. This makes cleanup easy — delete the resource group to remove all resources at once.
 
@@ -254,7 +254,7 @@ Click **Create**. The portal provisions:
 On the project **Home** page, you will see the **project endpoint** and **API key**. Copy the endpoint — you will need this later:
 
 ```
-https://<foundry-resource-name>.ai.azure.com/api/projects/cimic-project-intelligence
+https://<foundry-resource-name>.ai.azure.com/api/projects/project-intelligence
 ```
 
 > **Note:** You don't need the API key if you use **Microsoft Entra ID** authentication (recommended).
@@ -266,7 +266,7 @@ https://<foundry-resource-name>.ai.azure.com/api/projects/cimic-project-intellig
 ```
 Foundry Resource (top-level — governance, networking, model deployments)
 │
-├── Project: cimic-project-intelligence (default)
+├── Project: project-intelligence (default)
 │     ├── Agents
 │     ├── Evaluations
 │     ├── Files & Datasets
@@ -306,7 +306,7 @@ The agent requires a language model to power its reasoning. We'll deploy **GPT-4
 
 3. Click **Deploy**
 
-> **Tip:** Global Standard deployments offer the best availability. For production CIMIC workloads, consider **Standard** (regional) deployment for data residency in Australia.
+> **Tip:** Global Standard deployments offer the best availability. For production workloads, consider **Standard** (regional) deployment for data residency requirements.
 
 ### Step 3: Verify Deployment
 
@@ -332,7 +332,7 @@ This enables the **Tracing** tab in your project for monitoring agent conversati
 
 ### Azure Key Vault (Secrets)
 
-By default, Foundry stores connection secrets in a **managed Key Vault**. For enterprise CIMIC deployments, you can optionally bring your own Key Vault:
+By default, Foundry stores connection secrets in a **managed Key Vault**. For enterprise deployments, you can optionally bring your own Key Vault:
 
 1. In **Operate** → **Admin** → **Connections**
 2. Configure your Key Vault connection
@@ -367,9 +367,9 @@ At the end of this module, you should have:
 
 | Resource | Name | Status |
 |----------|------|--------|
-| Resource Group | `rg-cimic-ai-workshop` | Created |
+| Resource Group | `rg-ai-workshop` | Created |
 | Foundry Resource | *(auto-created with project)* | Created |
-| Foundry Project | `cimic-project-intelligence` | Created |
+| Foundry Project | `project-intelligence` | Created |
 | Model Deployment | `gpt-4o` | Deployed |
 | Application Insights | *(connected)* | Optional |
 
@@ -380,7 +380,7 @@ Record these values — you will use them in subsequent modules.
 ## Checkpoint ✓
 
 - [ ] Foundry resource created in Australia East (V2 — no Hub)
-- [ ] Project `cimic-project-intelligence` created
+- [ ] Project `project-intelligence` created
 - [ ] GPT-4o model deployed and status is Succeeded
 - [ ] Project endpoint URL copied
 - [ ] RBAC permissions verified (Azure AI User role)

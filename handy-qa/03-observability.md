@@ -94,7 +94,7 @@ from langchain_azure_ai.callbacks.tracers import AzureAIOpenTelemetryTracer
 azure_tracer = AzureAIOpenTelemetryTracer(
     connection_string=os.environ["APPLICATION_INSIGHTS_CONNECTION_STRING"],
     enable_content_recording=True,
-    name="CIMIC Agent",
+    name="Workshop Agent",
 )
 
 # Attach to chains/agents
