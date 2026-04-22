@@ -106,3 +106,10 @@ The `src/` directory contains three standalone implementations that complement t
 | [`src/eval/`](src/eval/) | **Agent Evaluation** — Batch evaluation script using the Foundry SDK with 10 test cases and 5 built-in evaluators (task adherence, intent resolution, tool accuracy, coherence, safety) | Module 5 |
 
 Each folder has its own `README.md` with setup instructions and prerequisites.
+
+---
+
+## Contributors
+
+- [Katherine Tran](https://github.com/KietNhiTran)
+- [Sajit Gurubacharya](https://github.com/sazit)
