@@ -8,6 +8,10 @@
 
 ---
 
+> **Disclaimer:** This workshop is designed for understanding Microsoft Foundry concepts and capabilities in a self-run environment. The focus is on learning the platform and its tooling — not on the accuracy or production-readiness of the agent being built.
+
+---
+
 ## Workshop Overview
 
 This workshop demonstrates how to build AI agents using **Microsoft Foundry** that leverage **Azure Databricks** as a data source — enabling intelligent decision support for project cost forecasting, equipment maintenance scheduling, safety incident analysis, and supply chain optimization.
