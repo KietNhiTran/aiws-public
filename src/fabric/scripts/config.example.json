@@ -1,0 +1,26 @@
+{
+  "workspace": {
+    "name": "contoso-aiws-dev",
+    "id": "REPLACE_WITH_WORKSPACE_ID",
+    "capacity": "REPLACE_WITH_CAPACITY_NAME"
+  },
+  "items": {
+    "lakehouse": {
+      "name": "contoso_lakehouse",
+      "id": "REPLACE_WITH_LAKEHOUSE_ID"
+    },
+    "sql_database": {
+      "name": "contoso_sqldb",
+      "id": "REPLACE_WITH_SQLDB_ID"
+    },
+    "semantic_model": {
+      "name": "Contoso_KPI_Model",
+      "id": null
+    },
+    "mirrored_database": {
+      "name": "Mirror_contoso",
+      "id": null
+    }
+  },
+  "agents": []
+}
