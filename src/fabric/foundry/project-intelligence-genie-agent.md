@@ -168,7 +168,7 @@ Safety queries always take precedence. If any data suggests a critical safety co
 - Databricks workspace with Unity Catalog
 - Genie Space ID: configure in Foundry tool settings
 - 9 tables across 6 schemas: projects, safety, equipment, workforce, procurement, quality, environmental
-- RLS enabled via `security.division_filter` function — Genie results respect row-level security per user's Entra group (Group-A → CPB, Group-B → Division-Beta, Group-C → Division-Gamma, Group-Executives → all)
+- RLS enabled via `security.division_filter` function — Genie results respect row-level security per user's Entra group (Group-A → Division-Alpha, Group-B → Division-Beta, Group-C → Division-Gamma, Group-Executives → all)
 - Tables with RLS: financials, equipment_telemetry, incidents
 - Tables without RLS: milestones, materials, timesheets, maintenance_log, inspections, emissions
 
