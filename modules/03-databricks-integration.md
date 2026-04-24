@@ -3,7 +3,152 @@
 **Duration:** 90 minutes  
 **Objective:** Connect your Foundry agent to Azure Databricks using the two most meaningful integration approaches — **MCP-based Genie** (zero-code, direct) and **Fabric mirroring** (enterprise data layer).
 
-> **Note:** This module is self-contained — all SQL DDL and sample data are provided inline below. For automated deployment scripts (Databricks Asset Bundles, Fabric workspace provisioning), this is not included in the workshop and need pr-configured.
+> **Note:** This module is self-contained — all SQL DDL and sample data are provided inline below.  
+> For **automated deployment** (Databricks Asset Bundles + Fabric workspace provisioning), see the deployment scripts in [`src/databricks/`](../src/databricks/) and [`src/fabric/`](../src/fabric/). Refer to the [Automated Deployment Guide](#automated-deployment-guide) at the end of this module.
+
+---
+
+## Automated Deployment Guide
+
+> **Skip this section** if you're following the manual workshop steps (3.2–3.5 below). Use this section when you want to deploy the full environment using the provided scripts.
+
+### Prerequisites
+
+| Tool | Version | Install |
+|------|---------|---------|
+| Azure CLI | 2.50+ | `winget install Microsoft.AzureCLI` or [install docs](https://learn.microsoft.com/cli/azure/install-azure-cli) |
+| Databricks CLI | 0.220+ | `pip install databricks-cli` or [install docs](https://docs.databricks.com/dev-tools/cli/install.html) |
+| Python | 3.9+ | [python.org](https://www.python.org/downloads/) |
+| pip packages | — | `pip install requests python-dotenv` |
+
+### Step 1 — Configure Environment
+
+```bash
+# Copy the master env template and fill in your values
+cp .env.example .env.local
+
+# Required values to fill in:
+#   AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP
+#   DATABRICKS_HOST, DATABRICKS_CLUSTER_ID, DATABRICKS_CATALOG
+#   FABRIC_WORKSPACE_NAME, FABRIC_CAPACITY_NAME
+```
+
+See [`.env.example`](../.env.example) for the full list of configuration values and descriptions.
+
+### Step 2 — Deploy Databricks (Asset Bundles)
+
+The Databricks deployment uses [Databricks Asset Bundles (DABs)](https://docs.databricks.com/dev-tools/bundles/index.html) to deploy notebooks as jobs.
+
+```bash
+# Authenticate to Databricks
+databricks auth login --host $DATABRICKS_HOST
+
+# Navigate to the Databricks source
+cd src/databricks
+
+# Deploy the bundle (creates jobs in the workspace)
+databricks bundle deploy -t dev
+
+# Run Step 1: Create schemas + generate sample data + configure RLS + create Fabric mirror tables
+databricks bundle run module03_data_setup -t dev
+
+# Run Step 2: Create Genie Spaces (5 spaces — 1 cross-domain + 4 domain-specific)
+databricks bundle run module03_genie_spaces -t dev
+```
+
+**What this deploys:**
+
+| Job | Tasks | What It Creates |
+|-----|-------|-----------------|
+| `module03_data_setup` | `create_schema` → `generate_data` → `configure_rls` → `create_fabric_tables` | 4 Unity Catalog schemas, ~8,000 rows across 4 tables, RLS with Group-A/B/C/D, Fabric mirror tables (`_f` suffix) |
+| `module03_genie_spaces` | `setup_genie_spaces` | 5 Genie Spaces (Projects, Safety, Equipment, Procurement, Cross-domain) with curated instructions |
+
+**Row-Level Security (RLS) Groups:**
+
+| Group | Division | Tables Filtered |
+|-------|----------|-----------------|
+| Group-A | Division-Alpha | `projects.financials`, `equipment.equipment_telemetry`, `safety.incidents` |
+| Group-B | Division-Beta | Same 3 tables |
+| Group-C | Division-Gamma | Same 3 tables |
+| Group-D | Division-Delta | Same 3 tables |
+
+> Assign users to these groups in Databricks Account Console → Groups to demo RLS. `procurement.materials` has no RLS — all groups see all rows.
+
+### Step 3 — Deploy Fabric Workspace
+
+```bash
+cd src/fabric
+
+# Authenticate to Azure
+az login --tenant $AZURE_TENANT_ID
+
+# Step 1: Deploy workspace items (Lakehouse, SQL DB, Semantic Model, Mirrored DB, 5 Data Agents)
+python scripts/01_deploy_workspace.py \
+  --workspace "$FABRIC_WORKSPACE_NAME" \
+  --capacity "$FABRIC_CAPACITY_NAME" \
+  --dbx-host "$FABRIC_DBX_HOST" \
+  --dbx-catalog "$FABRIC_DBX_CATALOG" \
+  --config-out scripts/config.json
+
+# Step 2: Populate SQL Database with summary data
+python scripts/02_populate_sql_db.py --config scripts/config.json
+
+# Step 3: Populate Lakehouse tables (KPI rollups)
+python scripts/03_populate_lakehouse.py --config scripts/config.json
+```
+
+**What this deploys:**
+
+```
+Fabric Workspace: contoso-aiws-dev
+├── contoso_lakehouse        (ProjectKPIs, SafetyKPIs, FleetKPIs)
+├── contoso_sqldb             (division_summary, monthly_kpis, supplier_scorecard)
+├── Contoso_KPI_Model         (Semantic Model)
+├── Mirror_contoso            (Mirrored Databricks Catalog)
+└── 5 Data Agents:
+    ├── Contoso Project Intelligence  → ALL sources (cross-domain)
+    ├── Projects Agent                → mirrored financials
+    ├── Safety Agent                  → mirrored incidents + lakehouse
+    ├── Equipment Agent               → mirrored telemetry + lakehouse
+    └── Procurement Agent             → mirrored materials + SQL DB
+```
+
+### Step 4 — Configure Data Agents
+
+After deployment, you need to configure each Data Agent's instructions and data sources in the Fabric portal:
+
+1. Open your Fabric workspace → find each agent
+2. For each agent, paste the instructions from the corresponding file in [`src/fabric/agents/`](../src/fabric/agents/):
+   - **Contoso Project Intelligence** → [`agents/project-intelligence.md`](../src/fabric/agents/project-intelligence.md)
+   - **Projects Agent** → [`agents/projects.md`](../src/fabric/agents/projects.md)
+   - **Safety Agent** → [`agents/safety.md`](../src/fabric/agents/safety.md)
+   - **Equipment Agent** → [`agents/equipment.md`](../src/fabric/agents/equipment.md)
+   - **Procurement Agent** → [`agents/procurement.md`](../src/fabric/agents/procurement.md)
+3. Add the data sources listed in the agent file (lakehouse tables, SQL tables, mirrored catalog tables, semantic model)
+4. Test each agent with the example questions provided in the instruction files
+
+### Step 5 — Connect to Foundry
+
+Once both Databricks and Fabric are deployed:
+
+- **Genie via MCP** → Follow Section 3.2 below to connect Genie Spaces to your Foundry agent
+- **Fabric Data Agent** → Follow Section 3.4 below to connect Fabric Data Agents to your Foundry agent
+
+### Pipeline Scripts (Optional — Supply Chain Demo)
+
+The `src/databricks/pipeline/` directory contains a medallion architecture (Bronze → Silver → Gold) pipeline for supply chain data:
+
+```bash
+# Run the pipeline jobs
+databricks bundle run supply_chain_pipeline -t dev
+```
+
+| Script | Layer | Description |
+|--------|-------|-------------|
+| `00_source_simulator.py` | Landing | Generates GPS, delivery, stock, invoice data |
+| `01_bronze_ingestion.py` | Bronze | Raw ingestion with COPY INTO |
+| `02_silver_transform.py` | Silver | Dedup, type casting, quality checks |
+| `03_gold_aggregation.py` | Gold | KPI rollups, fleet utilisation, supplier scorecards |
 
 ---
 

@@ -226,7 +226,7 @@ Your Databricks deployment uses **account-level identity management** (the moder
 Still in the **Account Console**:
 
 1. Left sidebar → **"Workspaces"**
-2. Click on your workspace (`adb-7405614861019645`)
+2. Click on your workspace (e.g., `adb-XXXXXXXXX`)
 3. **"Permissions"** tab → **"Add permissions"**
 4. Search for `fabric-databricks-mirror-contoso-dev`
 5. Set role: **"User"**

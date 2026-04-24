@@ -17,6 +17,10 @@ venv/
 .databricks/
 *.egg-info/
 
+# Fabric config (contains workspace IDs)
+src/fabric/scripts/config.json
+src/fabric/scripts/config_prd.json
+
 # OS
 .DS_Store
 Thumbs.db
