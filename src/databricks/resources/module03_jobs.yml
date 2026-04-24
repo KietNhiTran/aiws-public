@@ -1,0 +1,89 @@
+# Module 03 aligned DABS job definitions
+# Deploy with: databricks bundle deploy -t dev
+# Run data:  databricks bundle run module03_data_setup -t dev
+# Run genie: databricks bundle run module03_genie_spaces -t dev
+
+resources:
+  jobs:
+    module03_data_setup:
+      name: "Module 03 - Contoso Data Setup"
+      description: "Creates contoso catalog schemas, generates sample data, configures RLS"
+      tags:
+        project: "contoso-aiws"
+        module: "03"
+        layer: "data"
+
+      tasks:
+        - task_key: "create_schema"
+          description: "Create contoso catalog with 4 tables (Module 03 schema)"
+          notebook_task:
+            notebook_path: "../setup/01_create_schema.py"
+            base_parameters:
+              catalog_name: "${var.catalog_name}"
+              customer_name: "${var.customer_name}"
+              external_storage_path: "${var.external_storage_path}"
+          existing_cluster_id: "${var.cluster_id}"
+
+        - task_key: "generate_data"
+          depends_on:
+            - task_key: "create_schema"
+          description: "Generate 1000+ rows per table with realistic Contoso data"
+          notebook_task:
+            notebook_path: "../setup/02_generate_data.py"
+            base_parameters:
+              catalog_name: "${var.catalog_name}"
+              customer_name: "${var.customer_name}"
+              num_projects: "${var.num_projects}"
+              num_telemetry_rows: "${var.num_telemetry_rows}"
+              num_incident_rows: "${var.num_incident_rows}"
+              num_material_rows: "${var.num_material_rows}"
+          existing_cluster_id: "${var.cluster_id}"
+
+        - task_key: "configure_rls"
+          depends_on:
+            - task_key: "create_schema"
+          description: "Configure division-based row-level security and Fabric mirror views"
+          notebook_task:
+            notebook_path: "../setup/04_configure_rls.py"
+            base_parameters:
+              catalog_name: "${var.catalog_name}"
+              customer_name: "${var.customer_name}"
+              apply_column_mask: "yes"
+              apply_row_filter: "yes"
+              apply_grants: "yes"
+              group_naming_style: "generic"
+              create_mirror_views: "no"
+              mirror_sp_id: ""
+          existing_cluster_id: "${var.cluster_id}"
+
+        - task_key: "create_fabric_tables"
+          depends_on:
+            - task_key: "generate_data"
+            - task_key: "configure_rls"
+          description: "Create _f mirror tables (no RLS) for Fabric mirroring"
+          notebook_task:
+            notebook_path: "../setup/06_create_fabric_tables.py"
+            base_parameters:
+              catalog_name: "${var.catalog_name}"
+              customer_name: "${var.customer_name}"
+              external_storage_path: "${var.external_storage_path}"
+          existing_cluster_id: "${var.cluster_id}"
+
+    module03_genie_spaces:
+      name: "Module 03 - Contoso Genie Spaces"
+      description: "Creates all-in-one and domain-specific Genie Spaces for contoso catalog"
+      tags:
+        project: "contoso-aiws"
+        module: "03"
+        layer: "genie"
+
+      tasks:
+        - task_key: "setup_genie_spaces"
+          description: "Create all 5 Genie Spaces (cross-domain + 4 domain-specific)"
+          notebook_task:
+            notebook_path: "../setup/05_domain_genie_spaces.py"
+            base_parameters:
+              catalog_name: "${var.catalog_name}"
+              customer_name: "${var.customer_name}"
+              warehouse_name: "${var.warehouse_name}"
+          existing_cluster_id: "${var.cluster_id}"
