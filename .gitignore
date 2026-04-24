@@ -64,3 +64,6 @@ desktop.ini
 
 # logs
 src/eval/logs
+
+# Blog drafts
+blog/
