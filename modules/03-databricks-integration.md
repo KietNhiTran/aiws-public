@@ -1,16 +1,16 @@
 # Module 3: Integrate Azure Databricks as Data Source
 
 **Duration:** 90 minutes  
-**Objective:** Connect your Foundry agent to Azure Databricks using the two most meaningful integration approaches — **MCP-based Genie** (zero-code, direct) and **Fabric mirroring** (enterprise data layer).
+**Objective:** Connect your Foundry agent to Azure Databricks using the two most meaningful integration approaches - **MCP-based Genie** (zero-code, direct) and **Fabric mirroring** (enterprise data layer).
 
-> **Note:** This module is self-contained — all SQL DDL and sample data are provided inline below.  
+> **Note:** This module is self-contained - all SQL DDL and sample data are provided inline below.  
 > For **automated deployment** (Databricks Asset Bundles + Fabric workspace provisioning), see the deployment scripts in [`src/databricks/`](../src/databricks/) and [`src/fabric/`](../src/fabric/). Refer to the [Automated Deployment Guide](#automated-deployment-guide) at the end of this module.
 
 ---
 
 ## Automated Deployment Guide
 
-> **Skip this section** if you're following the manual workshop steps (3.2–3.5 below). Use this section when you want to deploy the full environment using the provided scripts.
+> **Skip this section** if you're following the manual workshop steps (3.2-3.5 below). Use this section when you want to deploy the full environment using the provided scripts.
 
 ### Prerequisites
 
@@ -19,9 +19,9 @@
 | Azure CLI | 2.50+ | `winget install Microsoft.AzureCLI` or [install docs](https://learn.microsoft.com/cli/azure/install-azure-cli) |
 | Databricks CLI | 0.220+ | `pip install databricks-cli` or [install docs](https://docs.databricks.com/dev-tools/cli/install.html) |
 | Python | 3.9+ | [python.org](https://www.python.org/downloads/) |
-| pip packages | — | `pip install requests python-dotenv` |
+| pip packages | - | `pip install requests python-dotenv` |
 
-### Step 1 — Configure Environment
+### Step 1 - Configure Environment
 
 ```bash
 # Copy the master env template and fill in your values
@@ -35,7 +35,7 @@ cp .env.example .env.local
 
 See [`.env.example`](../.env.example) for the full list of configuration values and descriptions.
 
-### Step 2 — Deploy Databricks (Asset Bundles)
+### Step 2 - Deploy Databricks (Asset Bundles)
 
 The Databricks deployment uses [Databricks Asset Bundles (DABs)](https://docs.databricks.com/dev-tools/bundles/index.html) to deploy notebooks as jobs.
 
@@ -52,7 +52,7 @@ databricks bundle deploy -t dev
 # Run Step 1: Create schemas + generate sample data + configure RLS + create Fabric mirror tables
 databricks bundle run module03_data_setup -t dev
 
-# Run Step 2: Create Genie Spaces (5 spaces — 1 cross-domain + 4 domain-specific)
+# Run Step 2: Create Genie Spaces (5 spaces - 1 cross-domain + 4 domain-specific)
 databricks bundle run module03_genie_spaces -t dev
 ```
 
@@ -72,9 +72,9 @@ databricks bundle run module03_genie_spaces -t dev
 | Group-C | Division-Gamma | Same 3 tables |
 | Group-D | Division-Delta | Same 3 tables |
 
-> Assign users to these groups in Databricks Account Console → Groups to demo RLS. `procurement.materials` has no RLS — all groups see all rows.
+> Assign users to these groups in Databricks Account Console → Groups to demo RLS. `procurement.materials` has no RLS - all groups see all rows.
 
-### Step 3 — Deploy Fabric Workspace
+### Step 3 - Deploy Fabric Workspace
 
 ```bash
 cd src/fabric
@@ -113,7 +113,7 @@ Fabric Workspace: contoso-aiws-dev
     └── Procurement Agent             → mirrored materials + SQL DB
 ```
 
-### Step 4 — Configure Data Agents
+### Step 4 - Configure Data Agents
 
 After deployment, you need to configure each Data Agent's instructions and data sources in the Fabric portal:
 
@@ -127,14 +127,14 @@ After deployment, you need to configure each Data Agent's instructions and data 
 3. Add the data sources listed in the agent file (lakehouse tables, SQL tables, mirrored catalog tables, semantic model)
 4. Test each agent with the example questions provided in the instruction files
 
-### Step 5 — Connect to Foundry
+### Step 5 - Connect to Foundry
 
 Once both Databricks and Fabric are deployed:
 
 - **Genie via MCP** → Follow Section 3.2 below to connect Genie Spaces to your Foundry agent
 - **Fabric Data Agent** → Follow Section 3.4 below to connect Fabric Data Agents to your Foundry agent
 
-### Pipeline Scripts (Optional — Supply Chain Demo)
+### Pipeline Scripts (Optional - Supply Chain Demo)
 
 The `src/databricks/pipeline/` directory contains a medallion architecture (Bronze → Silver → Gold) pipeline for supply chain data:
 
@@ -161,14 +161,14 @@ There are **two recommended patterns** for connecting Microsoft Foundry agents t
 | # | Pattern | Complexity | Code Required | Data Freshness | Auth Model | Best For |
 |---|---------|-----------|---------------|----------------|------------|----------|
 | 1 | **Databricks Genie via MCP** | Very Low | None | Real-time | OAuth per-user (Entra ID) | Ad-hoc analytics, NL-to-SQL |
-| 2 | **Fabric Mirroring + Data Agent** | Low–Medium | None (portal) | Near-real-time (seconds–minutes) | Fabric workspace permissions | Enterprise reporting, Power BI, cross-platform analytics |
+| 2 | **Fabric Mirroring + Data Agent** | Low-Medium | None (portal) | Near-real-time (seconds-minutes) | Fabric workspace permissions | Enterprise reporting, Power BI, cross-platform analytics |
 
 ### Why These Two?
 
 Other approaches (Custom Function Tools, Azure AI Search indexing, File Export) required **middleware code**, **Azure Function deployments**, or **batch export pipelines**. The landscape has changed:
 
-- **Databricks now provides managed MCP servers** — Genie is exposed as a ready-to-use MCP endpoint that plugs directly into Foundry's tool catalog. No wrapper code needed.
-- **Microsoft Fabric now mirrors Unity Catalog natively** — metadata-only sync (no data movement), giving Fabric full read access to Databricks tables. Fabric Data Agents can then query this mirrored data and connect to Foundry.
+- **Databricks now provides managed MCP servers** - Genie is exposed as a ready-to-use MCP endpoint that plugs directly into Foundry's tool catalog. No wrapper code needed.
+- **Microsoft Fabric now mirrors Unity Catalog natively** - metadata-only sync (no data movement), giving Fabric full read access to Databricks tables. Fabric Data Agents can then query this mirrored data and connect to Foundry.
 
 Both approaches are **zero-code** from the Foundry side and represent the current best practice as of April 2026.
 
@@ -185,16 +185,16 @@ Both approaches are **zero-code** from the Foundry side and represent the curren
 ```
 User: "What's the average cost overrun for road projects?"
     │
-    ▼
+    
 Foundry Agent (recognises Genie MCP tool is relevant)
     │
-    ▼ (MCP protocol — automatic)
+     (MCP protocol - automatic)
 Databricks Managed MCP Server
     │  https://<workspace>/api/2.0/mcp/genie/<space_id>
-    ▼
+    
 Genie (NL → SQL → execute against SQL Warehouse → result)
     │
-    ▼ (result returned via MCP)
+     (result returned via MCP)
 Foundry Agent (presents answer to user)
 ```
 
@@ -237,7 +237,7 @@ For this module, we use the **Genie MCP server**.
 
 If your Azure subscription already has a Databricks workspace with Unity Catalog, skip to **Step 3.2.0**.
 
-#### P1 — Create an Azure Databricks Workspace
+#### P1 - Create an Azure Databricks Workspace
 
 1. Open the [Azure Portal](https://portal.azure.com)
 2. Click **+ Create a resource** → search for **"Azure Databricks"**
@@ -254,18 +254,18 @@ If your Azure subscription already has a Databricks workspace with Unity Catalog
    > **Important:** Unity Catalog and Genie require the **Premium** pricing tier. The Standard tier does not support these features.
 
 4. Click **Review + Create** → **Create**
-5. Wait for deployment to complete (~3–5 minutes), then click **Go to resource**
+5. Wait for deployment to complete (~3-5 minutes), then click **Go to resource**
 6. Click **Launch Workspace** to open the Databricks UI
 
-#### P2 — Verify Unity Catalog Is Enabled
+#### P2 - Verify Unity Catalog Is Enabled
 
 Azure Databricks workspaces created after November 2023 have **Unity Catalog enabled by default** (automatic workspace assignment to an account-level metastore).
 
 Use **one** of the following methods to confirm:
 
-- **Method A — SQL query (easiest):** Run `SELECT CURRENT_METASTORE();` in a SQL editor or notebook. If it returns a metastore ID (e.g. `a]b1c2d3-...`), Unity Catalog is enabled.
-- **Method B — Catalog Explorer:** Click the **Catalog** icon (![Data icon](https://learn.microsoft.com/azure/databricks/_static/images/product-icons/dataicon.svg)) in the left sidebar. If you can browse catalogs and schemas, Unity Catalog is active.
-- **Method C — Account Console:** Log into the [Account Console](https://accounts.azuredatabricks.net) → click **Workspaces** → check the **Metastore** column for your workspace.
+- **Method A - SQL query (easiest):** Run `SELECT CURRENT_METASTORE();` in a SQL editor or notebook. If it returns a metastore ID (e.g. `a]b1c2d3-...`), Unity Catalog is enabled.
+- **Method B - Catalog Explorer:** Click the **Catalog** icon (![Data icon](https://learn.microsoft.com/azure/databricks/_static/images/product-icons/dataicon.svg)) in the left sidebar. If you can browse catalogs and schemas, Unity Catalog is active.
+- **Method C - Account Console:** Log into the [Account Console](https://accounts.azuredatabricks.net) → click **Workspaces** → check the **Metastore** column for your workspace.
 
 If no metastore is assigned:
    - Go to the [Databricks Account Console](https://accounts.azuredatabricks.net)
@@ -282,7 +282,7 @@ If no metastore is assigned:
 
 > **Tip:** If you are a new Databricks customer, Azure auto-creates a metastore and assigns it to your workspace on first launch. Verify by running `SELECT current_metastore()` in a notebook.
 
-#### P3 — Create a SQL Warehouse
+#### P3 - Create a SQL Warehouse
 
 Genie requires a **Pro** or **Serverless SQL Warehouse** to execute queries.
 
@@ -294,13 +294,13 @@ Genie requires a **Pro** or **Serverless SQL Warehouse** to execute queries.
    |-------|-------|
    | Name | `ai-agent-warehouse` |
    | Cluster size | **2X-Small** (sufficient for workshop) |
-   | Type | **Serverless** (recommended — auto-starts, no idle cost) or **Pro** |
+   | Type | **Serverless** (recommended - auto-starts, no idle cost) or **Pro** |
    | Auto stop | **10 minutes** (saves cost during workshop pauses) |
 
 4. Click **Create**
-5. Wait for the warehouse to show **Running** status (Serverless starts in ~10 seconds; Pro may take 2–3 minutes)
+5. Wait for the warehouse to show **Running** status (Serverless starts in ~10 seconds; Pro may take 2-3 minutes)
 
-#### P4 — Enable Managed MCP Servers Preview
+#### P4 - Enable Managed MCP Servers Preview
 
 1. In the Databricks workspace, click your **username** in the top-right bar
 2. Select **"Previews"** directly from the dropdown menu
@@ -327,7 +327,7 @@ CREATE SCHEMA IF NOT EXISTS workshop.safety;
 CREATE SCHEMA IF NOT EXISTS workshop.procurement;
 ```
 
-**Project Financials** — budget, cost variance, EVM metrics for all divisions:
+**Project Financials** - budget, cost variance, EVM metrics for all divisions:
 
 ```sql
 CREATE OR REPLACE TABLE workshop.projects.financials (
@@ -364,7 +364,7 @@ INSERT INTO workshop.projects.financials VALUES
 ('P-2024-010', 'Pacific Highway Upgrade - Coffs Harbour', 'Contoso Build', 'Transport for NSW', 'Road Infrastructure', 'NSW', 950000000, 920000000, 900000000, 910000000, -2.2, 0.99, 0.98, 'green', '2022-09-01', '2026-03-31', '2025-03-31', 'Karen White');
 ```
 
-**Equipment Telemetry** — heavy equipment fleet IoT sensor data:
+**Equipment Telemetry** - heavy equipment fleet IoT sensor data:
 
 ```sql
 CREATE OR REPLACE TABLE workshop.equipment.equipment_telemetry (
@@ -395,7 +395,7 @@ INSERT INTO workshop.equipment.equipment_telemetry VALUES
 
 > **Verify:** Run `SELECT COUNT(*) FROM workshop.projects.financials` (expect 10) and `SELECT COUNT(*) FROM workshop.equipment.equipment_telemetry` (expect 10).
 
-**Safety Incidents** — HSE incident records across all divisions:
+**Safety Incidents** - HSE incident records across all divisions:
 
 ```sql
 CREATE OR REPLACE TABLE workshop.safety.incidents (
@@ -423,7 +423,7 @@ INSERT INTO workshop.safety.incidents VALUES
 ('INC-2025-007', '2025-04-10', 'Metro Tunnel Bore', 'Contoso Build', 'Noise Exposure', 'Minor', 'Noise level exceeded 85dB in section C without adequate signage', 0, 0, 'Missing signage after equipment change', 'Noise monitoring automated with real-time alerts', 'open');
 ```
 
-**Procurement Materials** — supplier pricing, lead times, availability:
+**Procurement Materials** - supplier pricing, lead times, availability:
 
 ```sql
 CREATE OR REPLACE TABLE workshop.procurement.materials (
@@ -543,7 +543,7 @@ INSERT INTO workshop.procurement.materials VALUES
 
 #### 3.2.2 Configure OAuth Identity Passthrough for Databricks
 
-OAuth Identity Passthrough ensures that every query the Foundry agent sends to Databricks runs **as the signed-in user** — not a shared service account. This is what makes Row-Level Security (step 3.2.5) work end-to-end.
+OAuth Identity Passthrough ensures that every query the Foundry agent sends to Databricks runs **as the signed-in user** - not a shared service account. This is what makes Row-Level Security (step 3.2.5) work end-to-end.
 
 > **Reference docs:**
 > - Databricks side: [Use Azure Databricks Genie in Microsoft Foundry](https://learn.microsoft.com/en-us/azure/databricks/integrations/microsoft-foundry)
@@ -553,28 +553,28 @@ OAuth Identity Passthrough ensures that every query the Foundry agent sends to D
 
 Foundry supports two OAuth options for MCP connections: **Managed** and **Custom**.
 
-- **Managed:** Microsoft handles the OAuth trust automatically — no app registration needed. You simply select "Managed" in the dropdown and Foundry's first-party Entra ID app handles tokens.
+- **Managed:** Microsoft handles the OAuth trust automatically - no app registration needed. You simply select "Managed" in the dropdown and Foundry's first-party Entra ID app handles tokens.
 - **Custom:** You create your own Entra ID app registration and provide the Client ID, Client Secret, and OAuth URLs.
 
-> **Important — Catalog entry availability:** The "Azure Databricks Genie" catalog entry in Foundry's **Build > Tools** is in **Public Preview** and is rolling out progressively. As of April 2026, it may **not appear** in all regions or tenants (including Australia East). If you cannot find "Azure Databricks Genie" in the tool catalog, or if the "Managed" OAuth option does not appear, use the **Custom OAuth** approach below. It connects to the exact same Databricks MCP endpoint and is functionally identical.
+> **Important - Catalog entry availability:** The "Azure Databricks Genie" catalog entry in Foundry's **Build > Tools** is in **Public Preview** and is rolling out progressively. As of April 2026, it may **not appear** in all regions or tenants (including Australia East). If you cannot find "Azure Databricks Genie" in the tool catalog, or if the "Managed" OAuth option does not appear, use the **Custom OAuth** approach below. It connects to the exact same Databricks MCP endpoint and is functionally identical.
 
-This guide uses the **Custom OAuth** approach — it works reliably regardless of whether the catalog entry has rolled out to your region.
+This guide uses the **Custom OAuth** approach - it works reliably regardless of whether the catalog entry has rolled out to your region.
 
 ```
 Foundry Agent
     │
-    ▼ (MCP call — user redirected to sign in)
+     (MCP call - user redirected to sign in)
 Microsoft Entra ID (your registered app)
     │ (issues delegated token for the signed-in user,
     │  scoped to Azure Databricks resource)
-    ▼
+    
 Azure Databricks (validates Entra ID token)
     │ (identifies user as alice@contoso.com)
-    ▼
+    
 Unity Catalog (enforces Alice's permissions + row filters)
 ```
 
-##### Step 1 — Verify Entra ID User Sync to Databricks
+##### Step 1 - Verify Entra ID User Sync to Databricks
 
 For OAuth Identity Passthrough to work, the users who access the Foundry agent must also exist in the Databricks workspace. Azure Databricks auto-syncs Entra ID identities when using Azure-managed workspaces, but verify this is working:
 
@@ -587,7 +587,7 @@ For OAuth Identity Passthrough to work, the users who access the Foundry agent m
 
 > **Key point:** The Entra ID email in Databricks must exactly match the email the user signs in with in Foundry. Since both use the same Entra ID tenant, this happens automatically.
 
-##### Step 2 — Register an Entra ID App for Databricks OAuth
+##### Step 2 - Register an Entra ID App for Databricks OAuth
 
 Create an app registration in Microsoft Entra ID that Foundry will use to request tokens scoped to Azure Databricks on behalf of each user.
 
@@ -610,7 +610,7 @@ Create an app registration in Microsoft Entra ID that Foundry will use to reques
    - Description: `foundry-mcp-secret`
    - Expiry: 6 or 12 months
    - Click **Add**
-   - **Copy the secret Value immediately** — it is only shown once
+   - **Copy the secret Value immediately** - it is only shown once
 
 7. Go to **API permissions** → **+ Add a permission**
    - Select **APIs my organization uses**
@@ -620,9 +620,9 @@ Create an app registration in Microsoft Entra ID that Foundry will use to reques
    - Click **Add permissions**
    - (Recommended) Click **Grant admin consent for [your tenant]** if you have admin rights
 
-> **Why this works:** Azure Databricks natively uses Entra ID as its identity provider. The resource ID `2ff814a6-3304-4ab8-85cb-cd0e6f879c1d` is the Azure Databricks service principal in Entra ID. When Foundry requests a token with this scope, Entra ID issues a delegated token that Databricks accepts — no Databricks-side app configuration needed.
+> **Why this works:** Azure Databricks natively uses Entra ID as its identity provider. The resource ID `2ff814a6-3304-4ab8-85cb-cd0e6f879c1d` is the Azure Databricks service principal in Entra ID. When Foundry requests a token with this scope, Entra ID issues a delegated token that Databricks accepts - no Databricks-side app configuration needed.
 
-##### Step 3 — Connect Genie to the Foundry Agent via Custom MCP
+##### Step 3 - Connect Genie to the Foundry Agent via Custom MCP
 
 1. Open [Microsoft Foundry Portal](https://ai.azure.com) → select your project
 2. Go to **Build > Tools** → click **+ Add Tool** → select **Custom** → **MCP**
@@ -634,7 +634,7 @@ Create an app registration in Microsoft Entra ID that Foundry will use to reques
    | Remote MCP Server endpoint | `https://adb-<workspace-id>.azuredatabricks.net/api/2.0/mcp/genie/<genie_space_id>` |
    | Authentication | **OAuth Identity Passthrough** |
 
-   > **Tip:** Find your workspace hostname from the Databricks workspace URL. Find your Genie Space ID from the Genie space URL: `https://<instance>/genie/rooms/<space-id>` — the `<space-id>` is what you need.
+   > **Tip:** Find your workspace hostname from the Databricks workspace URL. Find your Genie Space ID from the Genie space URL: `https://<instance>/genie/rooms/<space-id>` - the `<space-id>` is what you need.
 
 4. Select **Custom** for OAuth provider, then fill in:
 
@@ -651,7 +651,7 @@ Create an app registration in Microsoft Entra ID that Foundry will use to reques
 
 5. Click **Connect**
 
-##### Step 4 — Add the Redirect URI Back to Your Entra ID App
+##### Step 4 - Add the Redirect URI Back to Your Entra ID App
 
 After connecting, Foundry provides a **redirect URL**.
 
@@ -661,20 +661,20 @@ After connecting, Foundry provides a **redirect URL**.
 4. Paste the redirect URL from Foundry
 5. Click **Configure**
 
-> **If you see the "Azure Databricks Genie" catalog entry:** In some regions/tenants, the catalog entry is available in Foundry's tool catalog. If you find it when searching in **Build > Tools**, you can use it with the **Managed** OAuth option instead — it handles the Entra ID app automatically. The Custom approach documented here is functionally identical and works everywhere.
+> **If you see the "Azure Databricks Genie" catalog entry:** In some regions/tenants, the catalog entry is available in Foundry's tool catalog. If you find it when searching in **Build > Tools**, you can use it with the **Managed** OAuth option instead - it handles the Entra ID app automatically. The Custom approach documented here is functionally identical and works everywhere.
 
-> **Why not PAT or Service Principal?** A Personal Access Token (PAT) or Service Principal authenticates as a **single identity** — all agent users would share the same Databricks permissions, completely bypassing Row-Level Security. OAuth Identity Passthrough ensures each user's query runs under **their own Entra ID identity**, so Unity Catalog row filters and column masks are enforced per user.
+> **Why not PAT or Service Principal?** A Personal Access Token (PAT) or Service Principal authenticates as a **single identity** - all agent users would share the same Databricks permissions, completely bypassing Row-Level Security. OAuth Identity Passthrough ensures each user's query runs under **their own Entra ID identity**, so Unity Catalog row filters and column masks are enforced per user.
 >
 > | Auth Method | Identity Used | RLS Enforced? | Use Case |
 > |-------------|--------------|---------------|----------|
-> | **OAuth Identity Passthrough (Custom)** | Signed-in user's Entra ID | **Yes** — per user | Production with RLS ✅ |
-> | OAuth Identity Passthrough (Managed) | Signed-in user's Entra ID | **Yes** — per user | Production (if catalog entry available) ✅ |
+> | **OAuth Identity Passthrough (Custom)** | Signed-in user's Entra ID | **Yes** - per user | Production with RLS  |
+> | OAuth Identity Passthrough (Managed) | Signed-in user's Entra ID | **Yes** - per user | Production (if catalog entry available)  |
 > | PAT (Personal Access Token) | Token owner (single user) | Only for that one user | Quick personal testing only |
-> | Service Principal | App identity (no human user) | No — sees all data | Backend batch jobs (not agent) |
+> | Service Principal | App identity (no human user) | No - sees all data | Backend batch jobs (not agent) |
 
 #### 3.2.3 Authorize the Connection (Per-User Consent)
 
-Each user must grant consent the **first time** they use the agent with the Genie tool. This is a standard Entra ID delegated consent flow — similar to approving a Microsoft 365 app.
+Each user must grant consent the **first time** they use the agent with the Genie tool. This is a standard Entra ID delegated consent flow - similar to approving a Microsoft 365 app.
 
 ##### First-Time Consent Walkthrough
 
@@ -685,51 +685,51 @@ Each user must grant consent the **first time** they use the agent with the Geni
    What tables do you have access to?
    ```
 
-3. The agent attempts to call the Genie MCP tool — a **consent banner** appears in the response:
+3. The agent attempts to call the Genie MCP tool - a **consent banner** appears in the response:
 
    > "This agent needs to connect to Azure Databricks on your behalf. [Open consent]"
 
-4. Click **"Open consent"** — a new browser window opens showing the **Microsoft Entra ID consent page**
+4. Click **"Open consent"** - a new browser window opens showing the **Microsoft Entra ID consent page**
 5. Sign in with your Entra ID credentials (e.g., `alice@contoso.com`)
 6. Review the permissions requested (you'll see `user_impersonation` for Azure Databricks) and click **Approve**
-7. The browser shows a confirmation dialog — close it and return to Foundry
-8. Re-send the query — the agent now calls Genie using your token
+7. The browser shows a confirmation dialog - close it and return to Foundry
+8. Re-send the query - the agent now calls Genie using your token
 
 ##### What Happens Behind the Scenes
 
 ```
 User sends query in Foundry
     │
-    ▼
+    
 Foundry Agent determines Genie tool is needed
     │
-    ▼ (no valid token for this user yet)
+     (no valid token for this user yet)
 Foundry returns oauth_consent_request → user clicks "Open consent"
     │
-    ▼
+    
 Browser → Microsoft Entra ID login.microsoftonline.com
     │        (OAuth 2.0 authorization code flow)
     │        Scope: 2ff814a6-.../.default (includes user_impersonation)
     │        App: Foundry-Databricks-Genie (your Entra ID app)
-    ▼
+    
 User signs in (or SSO) and clicks "Approve"
     │
-    ▼
+    
 Entra ID issues authorization code → redirects to Foundry via your app's redirect URI
     │
-    ▼
+    
 Foundry exchanges code for access token + refresh token
     │  (access token is scoped to Azure Databricks for this user)
-    ▼
+    
 Foundry calls Databricks MCP endpoint with Alice's token
     │
-    ▼
+    
 Databricks validates Entra ID token → identifies user as Alice
     │
-    ▼
+    
 Genie → SQL Warehouse → Unity Catalog
     │  (Unity Catalog enforces Alice's row filters + column masks)
-    ▼
+    
 Results returned → only data Alice is authorised to see
 ```
 
@@ -737,10 +737,10 @@ Results returned → only data Alice is authorised to see
 
 | Token | Lifetime | Managed By | User Action |
 |-------|----------|-----------|-------------|
-| **Access token** | ~1 hour | Foundry auto-refreshes silently | None — transparent to user |
+| **Access token** | ~1 hour | Foundry auto-refreshes silently | None - transparent to user |
 | **Refresh token** | Up to 90 days (Entra ID default) | Foundry stores encrypted per-user | Re-consent only if token expires or is revoked |
 
-- **Automatic refresh:** Foundry uses the refresh token to obtain new access tokens silently — the user won't see the consent prompt again during normal use
+- **Automatic refresh:** Foundry uses the refresh token to obtain new access tokens silently - the user won't see the consent prompt again during normal use
 - **Revocation:** A user can revoke their consent in [My Account](https://myaccount.microsoft.com) → **Permissions** → find the Foundry/Databricks application → **Revoke**
 - **Admin revocation:** A tenant admin can revoke consent for all users via Entra ID → **Enterprise applications** → find the Foundry application → **Permissions** → revoke
 
@@ -787,9 +787,9 @@ Which materials have increasing price trends? Show supplier and pricing.
 
 #### 3.2.5 Configure Row-Level Security (RLS) in Unity Catalog
 
-A key requirement is **division-level data isolation** — a Contoso Build user should only see Contoso Build projects, while a Contoso Mining user sees only Contoso Mining data. Unity Catalog **row filters** enforce this automatically, and because the Genie MCP connection uses OAuth Identity Passthrough, the same filters apply when querying through the Foundry agent.
+A key requirement is **division-level data isolation** - a Contoso Build user should only see Contoso Build projects, while a Contoso Mining user sees only Contoso Mining data. Unity Catalog **row filters** enforce this automatically, and because the Genie MCP connection uses OAuth Identity Passthrough, the same filters apply when querying through the Foundry agent.
 
-##### Step A — Create Entra ID Security Groups
+##### Step A - Create Entra ID Security Groups
 
 Create groups in Microsoft Entra ID that map to divisions. These groups will be referenced in Unity Catalog row filters.
 
@@ -810,7 +810,7 @@ Create groups in Microsoft Entra ID that map to divisions. These groups will be 
 
 > **Workshop shortcut:** If you only have one or two test accounts, add one to `Group-A` and another to `Group-B` to demonstrate the difference.
 
-##### Step B — Sync Entra ID Groups to Databricks
+##### Step B - Sync Entra ID Groups to Databricks
 
 Unity Catalog needs to recognise these Entra ID groups.
 
@@ -820,7 +820,7 @@ Unity Catalog needs to recognise these Entra ID groups.
    - If not, click **Add group** → search for each `Group-*` group and add it
 3. Assign each group to your workspace: **Workspaces** → `dbw-workshop` → **Permissions** → add each group with **User** workspace access
 
-##### Step C — Create a Row Filter Function
+##### Step C - Create a Row Filter Function
 
 Row filters in Unity Catalog use a **SQL function** that returns `TRUE` for rows the current user is allowed to see. Run this in a Databricks SQL notebook:
 
@@ -843,7 +843,7 @@ RETURN
 
 > **How it works:** `IS_ACCOUNT_GROUP_MEMBER()` checks the Entra ID identity of the current user (passed through via OAuth) against account-level groups. No user mapping table is needed.
 
-##### Step D — Apply Row Filters to Tables
+##### Step D - Apply Row Filters to Tables
 
 Attach the filter function to each table's `division` column:
 
@@ -861,16 +861,16 @@ ALTER TABLE workshop.safety.incidents
   SET ROW FILTER workshop.security.division_filter ON (division);
 
 -- Procurement materials: no division column, so no row filter needed
--- (all users can see all materials — this is shared reference data)
+-- (all users can see all materials - this is shared reference data)
 ```
 
-> **Important:** Row filters are enforced at the **Unity Catalog level** — they apply to all query paths including Genie, direct SQL, notebooks, and MCP. There is no way to bypass them without catalog admin privileges.
+> **Important:** Row filters are enforced at the **Unity Catalog level** - they apply to all query paths including Genie, direct SQL, notebooks, and MCP. There is no way to bypass them without catalog admin privileges.
 
-##### Step E — Verify RLS in Databricks (Before Testing in Foundry)
+##### Step E - Verify RLS in Databricks (Before Testing in Foundry)
 
 Run these verification queries as different users to confirm the filters work:
 
-1. **As a Contoso Build user** (`alice@contoso.com` — member of `Group-A`):
+1. **As a Contoso Build user** (`alice@contoso.com` - member of `Group-A`):
 
    ```sql
    SELECT project_name, division, status FROM workshop.projects.financials;
@@ -878,7 +878,7 @@ Run these verification queries as different users to confirm the filters work:
 
    *Expected:* Only rows where `division = 'Contoso Build'` are returned (5 projects).
 
-2. **As a Contoso Mining user** (`bob@contoso.com` — member of `Group-B`):
+2. **As a Contoso Mining user** (`bob@contoso.com` - member of `Group-B`):
 
    ```sql
    SELECT project_name, division, status FROM workshop.projects.financials;
@@ -886,7 +886,7 @@ Run these verification queries as different users to confirm the filters work:
 
    *Expected:* Only rows where `division = 'Contoso Mining'` are returned (3 projects).
 
-3. **As an Executive** (`carol@contoso.com` — member of `Group-Executives`):
+3. **As an Executive** (`carol@contoso.com` - member of `Group-Executives`):
 
    ```sql
    SELECT project_name, division, status FROM workshop.projects.financials;
@@ -896,7 +896,7 @@ Run these verification queries as different users to confirm the filters work:
 
 > **Tip:** To quickly test as different users in the workshop, open Databricks in separate browser profiles (e.g., Chrome normal + incognito + Edge) and sign in with different Entra ID accounts.
 
-##### Step E2 — Test RLS on Equipment Telemetry (Recommended Demo Query)
+##### Step E2 - Test RLS on Equipment Telemetry (Recommended Demo Query)
 
 Equipment telemetry is the best table for demonstrating RLS because the results are visually distinct per division. Use this query as the primary RLS test:
 
@@ -927,7 +927,7 @@ GROUP BY division;
 |----------|-------------|-------------|-------------------|----------------|-----------------|
 | Contoso Build | ~1,250 | ~1,000 | ~63 | ~125 | ~63 |
 
-**Only one row** — Contoso Build. The user cannot see Contoso Mining or Contoso Engineering data.
+**Only one row** - Contoso Build. The user cannot see Contoso Mining or Contoso Engineering data.
 
 *Expected result for Group-Executives user:*
 
@@ -938,11 +938,11 @@ GROUP BY division;
 | Contoso Engineering | ~1,250 | ~1,000 | ~63 | ~125 | ~63 |
 | Contoso Partnerships | ~1,250 | ~1,000 | ~63 | ~125 | ~63 |
 
-**All four divisions** visible. This is the clearest demo of RLS — same question, different results based on group membership.
+**All four divisions** visible. This is the clearest demo of RLS - same question, different results based on group membership.
 
 > **Key point:** The Genie Space, agent instructions, and MCP tool are identical for all users. The division-level isolation is enforced entirely by the Unity Catalog `division_filter` row filter function.
 
-##### Step F — Test RLS Through the Foundry Agent
+##### Step F - Test RLS Through the Foundry Agent
 
 Now test that the same row filters are enforced when querying via the Foundry agent's Genie MCP tool.
 
@@ -980,7 +980,7 @@ Now test that the same row filters are enforced when querying via the Foundry ag
 
 5. **Sign in as the Executive** (`carol@contoso.com`) and verify all 10 projects are returned.
 
-> **Key takeaway:** No configuration was needed on the Foundry side — the agent, system prompt, and Genie tool are identical for all users. Division-level isolation is enforced entirely by Unity Catalog row filters + OAuth Identity Passthrough. The Foundry agent inherits the user's Databricks permissions automatically.
+> **Key takeaway:** No configuration was needed on the Foundry side - the agent, system prompt, and Genie tool are identical for all users. Division-level isolation is enforced entirely by Unity Catalog row filters + OAuth Identity Passthrough. The Foundry agent inherits the user's Databricks permissions automatically.
 
 ##### (Optional) Column Masks for Sensitive Fields
 
@@ -1014,24 +1014,24 @@ This is the critical security advantage of the MCP approach:
 ```
 User (Entra ID: alice@contoso.com)
     │
-    ▼ (signs into Foundry with Entra ID)
+     (signs into Foundry with Entra ID)
 Foundry Agent
     │
-    ▼ (MCP call — passes Alice's identity token)
+     (MCP call - passes Alice's identity token)
 Databricks Managed MCP Server
     │
-    ▼ (authenticates as Alice via Entra ID)
+     (authenticates as Alice via Entra ID)
 Genie → SQL Warehouse → Unity Catalog
     │
-    ▼ (Unity Catalog checks Alice's permissions)
+     (Unity Catalog checks Alice's permissions)
 Only returns data Alice is authorised to see
 ```
 
 - A Contoso Build project manager sees **only Contoso Build data** (enforced by the row filter configured in step 3.2.5)
 - A Contoso Mining division head sees **only Contoso Mining data**
 - An Executive group member sees **all divisions**
-- No shared service account or PAT token — each user's permissions are enforced individually
-- **No Foundry-side configuration needed for RLS** — it is enforced entirely in Unity Catalog. The Foundry agent, system prompt, and Genie tool connection are identical for all users.
+- No shared service account or PAT token - each user's permissions are enforced individually
+- **No Foundry-side configuration needed for RLS** - it is enforced entirely in Unity Catalog. The Foundry agent, system prompt, and Genie tool connection are identical for all users.
 
 ### Rate Limits & Production Considerations
 
@@ -1042,18 +1042,18 @@ Only returns data Alice is authorised to see
 | Genie tables per space | Up to 30 | Genie Space | No |
 | MCP tool call timeout | 100 seconds | Foundry Agent Service | No |
 
-> **Note:** The 5 q/min Genie rate limit is the same regardless of whether you use MCP or direct API calls — it's enforced at the Genie service layer. For production with many concurrent users, contact your Databricks account team about a paid tier.
+> **Note:** The 5 q/min Genie rate limit is the same regardless of whether you use MCP or direct API calls - it's enforced at the Genie service layer. For production with many concurrent users, contact your Databricks account team about a paid tier.
 
 ### Pros & Cons
 
 | Pros | Cons |
 |------|------|
-| **Zero code** — entire setup via portal | Public Preview (not GA yet) |
-| OAuth Identity Passthrough — per-user Unity Catalog permissions | 5 q/min rate limit on Genie free tier |
+| **Zero code** - entire setup via portal | Public Preview (not GA yet) |
+| OAuth Identity Passthrough - per-user Unity Catalog permissions | 5 q/min rate limit on Genie free tier |
 | No middleware (no Azure Function) | No conversation history passed to Genie (invoked as a tool) |
 | Handles ad-hoc questions (NL-to-SQL) | Double-LLM latency (Foundry LLM + Genie AI) |
 | Same Foundry Portal experience as Module 2 | Requires "Managed MCP Servers" preview enabled |
-| Databricks hosts the MCP server — no infra to manage | Up to 30 tables per Genie space |
+| Databricks hosts the MCP server - no infra to manage | Up to 30 tables per Genie space |
 
 ---
 
@@ -1068,35 +1068,35 @@ Only returns data Alice is authorised to see
 ```
 Azure Databricks (Unity Catalog)
     │
-    ▼ (Mirroring — metadata sync, no data copy)
+     (Mirroring - metadata sync, no data copy)
 Microsoft Fabric (Mirrored Catalog)
     │
     ├──▶ SQL Analytics Endpoint (T-SQL queries)
-    ├──▶ Power BI (Direct Lake mode — reports & dashboards)
+    ├──▶ Power BI (Direct Lake mode - reports & dashboards)
     └──▶ Fabric Data Agent (NL-to-SQL, publishable API)
               │
-              ▼ (Published URL / Copilot in Power BI)
+               (Published URL / Copilot in Power BI)
          End Users / Foundry Integration
 ```
 
-**Key insight:** Fabric mirroring creates **shortcuts** to Databricks data — metadata only. The underlying data stays in Databricks (Delta Lake on ADLS). No ETL, no data duplication, no storage cost in Fabric.
+**Key insight:** Fabric mirroring creates **shortcuts** to Databricks data - metadata only. The underlying data stays in Databricks (Delta Lake on ADLS). No ETL, no data duplication, no storage cost in Fabric.
 
 ### When to Use This Over Genie MCP
 
 | Scenario | Genie MCP (Option 1) | Fabric Mirroring (Option 2) |
 |----------|---------------------|-----------------------------|
-| Quick ad-hoc questions from agent | ✅ Best | Possible but heavier setup |
-| Power BI dashboards on Databricks data | ❌ | ✅ Best (Direct Lake mode) |
-| T-SQL queries on Databricks tables | ❌ | ✅ (SQL Analytics Endpoint) |
-| Enterprise BI + governance layer | ❌ | ✅ (Fabric workspace security) |
-| Cross-source analytics (Databricks + other) | ❌ | ✅ (Fabric unifies sources) |
-| Copilot in Power BI over Databricks data | ❌ | ✅ Native |
+| Quick ad-hoc questions from agent |  Best | Possible but heavier setup |
+| Power BI dashboards on Databricks data |  |  Best (Direct Lake mode) |
+| T-SQL queries on Databricks tables |  |  (SQL Analytics Endpoint) |
+| Enterprise BI + governance layer |  |  (Fabric workspace security) |
+| Cross-source analytics (Databricks + other) |  |  (Fabric unifies sources) |
+| Copilot in Power BI over Databricks data |  |  Native |
 
 **Bottom line:** Use **Genie MCP** for direct agent-to-Databricks querying. Use **Fabric mirroring** when you need an enterprise analytics layer (Power BI, T-SQL, cross-source) on top of the same Databricks data.
 
 ### Prerequisites
 
-1. **Microsoft Fabric capacity** — F2 or higher (or Power BI Premium P1+)
+1. **Microsoft Fabric capacity** - F2 or higher (or Power BI Premium P1+)
 2. **Azure Databricks workspace** with Unity Catalog enabled
 3. **Databricks Service Principal** or Entra ID authentication
 4. **Fabric workspace** with contributor access
@@ -1116,12 +1116,12 @@ Fabric mirroring runs as a background service that periodically refreshes its co
 | # | Step | Where | Notes |
 |---|------|-------|-------|
 | 1 | **Create App Registration** | Entra ID → App registrations → + New registration | Record: Client ID, Tenant ID |
-| 2 | **Create Client Secret** | App reg → Certificates & secrets → + New client secret | ⚠️ Copy the Value immediately — it disappears |
-| 3 | **Add API Permission** | App reg → API permissions → + Add → **"APIs my organization uses"** → search **"AzureDatabricks"** → Delegated → `user_impersonation` | ⚠️ Must use "APIs my organization uses" tab, NOT "Microsoft APIs" |
+| 2 | **Create Client Secret** | App reg → Certificates & secrets → + New client secret |  Copy the Value immediately - it disappears |
+| 3 | **Add API Permission** | App reg → API permissions → + Add → **"APIs my organization uses"** → search **"AzureDatabricks"** → Delegated → `user_impersonation` |  Must use "APIs my organization uses" tab, NOT "Microsoft APIs" |
 | 4 | **Grant Admin Consent** | Same page → "Grant admin consent for [tenant]" | Requires Global Admin or Cloud App Admin |
 | 5 | **Add SP to Account Console** | [Databricks Account Console](https://accounts.azuredatabricks.net) → User management → Service principals → + Add | Enter the Application (Client) ID |
 | 6 | **Assign SP to Workspace** | Account Console → Workspaces → select workspace → Permissions → add SP with **CAN USE** | |
-| 7 | **Enable External Data Access** | Databricks workspace → Catalog → ⚙️ gear → Metastore → Details → toggle ON | Only metastore admins can do this |
+| 7 | **Enable External Data Access** | Databricks workspace → Catalog →  gear → Metastore → Details → toggle ON | Only metastore admins can do this |
 | 8 | **Grant UC Permissions** | Databricks SQL Editor (see SQL below) | Both standard + EXTERNAL USE SCHEMA |
 
 ##### Unity Catalog Grants
@@ -1134,7 +1134,7 @@ GRANT USE CATALOG ON CATALOG {catalog} TO `{sp_client_id}`;
 GRANT USE SCHEMA ON CATALOG {catalog} TO `{sp_client_id}`;
 GRANT SELECT ON CATALOG {catalog} TO `{sp_client_id}`;
 
--- ⚠️ CRITICAL — without this, mirroring returns "unexpected format" error
+--  CRITICAL - without this, mirroring returns "unexpected format" error
 GRANT EXTERNAL USE SCHEMA ON SCHEMA {catalog}.projects TO `{sp_client_id}`;
 GRANT EXTERNAL USE SCHEMA ON SCHEMA {catalog}.equipment TO `{sp_client_id}`;
 GRANT EXTERNAL USE SCHEMA ON SCHEMA {catalog}.safety TO `{sp_client_id}`;
@@ -1154,10 +1154,10 @@ GRANT EXTERNAL USE SCHEMA ON SCHEMA {catalog}.procurement TO `{sp_client_id}`;
 |-------|-------|-----|
 | `"Invalid credentials"` | Using Org Account (MFA blocks background refresh) | Switch to Service Principal authentication |
 | `"Invalid connection credentials"` (HTTP 400) | Missing AzureDatabricks API permission or admin consent | Step 3 + 4 above |
-| `"Unable to process response from Databricks. The API returned data in an unexpected format"` | Missing `EXTERNAL USE SCHEMA` grant | Step 8 — grant `EXTERNAL USE SCHEMA` on each schema |
-| `"AzureDatabricks"` not found in API permissions | Wrong tab — looking at "Microsoft APIs" | Switch to **"APIs my organization uses"** tab |
+| `"Unable to process response from Databricks. The API returned data in an unexpected format"` | Missing `EXTERNAL USE SCHEMA` grant | Step 8 - grant `EXTERNAL USE SCHEMA` on each schema |
+| `"AzureDatabricks"` not found in API permissions | Wrong tab - looking at "Microsoft APIs" | Switch to **"APIs my organization uses"** tab |
 
-> **⚠️ Important: Mirroring SP ≠ Genie OAuth.** The Service Principal configured here is for Fabric mirroring (background data sync). The Genie MCP connection (section 3.3.2) uses OAuth Identity Passthrough — each user authenticates as themselves. These are separate auth flows for separate purposes.
+> ** Important: Mirroring SP ≠ Genie OAuth.** The Service Principal configured here is for Fabric mirroring (background data sync). The Genie MCP connection (section 3.3.2) uses OAuth Identity Passthrough - each user authenticates as themselves. These are separate auth flows for separate purposes.
 
 ##### Fabric Tenant Prerequisites
 
@@ -1219,7 +1219,7 @@ After creation, Fabric provisions:
 
 3. Confirm the data matches your Databricks source
 
-> **⚠️ RLS does NOT propagate from Databricks to Fabric.** Unity Catalog row filters (section 3.3.5) are enforced when querying through Databricks (Genie, SQL Warehouse, notebooks). Fabric mirroring bypasses these filters because the SP reads data at the storage level. To enforce division-level isolation in Fabric, you must configure **OneLake Security roles** separately. See [`fabric/docs/fabric-mirroring-auth-permissions-rls-guide.md`](../fabric/docs/fabric-mirroring-auth-permissions-rls-guide.md) Section 8 for all 11 role definitions.
+> ** RLS does NOT propagate from Databricks to Fabric.** Unity Catalog row filters (section 3.3.5) are enforced when querying through Databricks (Genie, SQL Warehouse, notebooks). Fabric mirroring bypasses these filters because the SP reads data at the storage level. To enforce division-level isolation in Fabric, you must configure **OneLake Security roles** separately. See [`fabric/docs/fabric-mirroring-auth-permissions-rls-guide.md`](../fabric/docs/fabric-mirroring-auth-permissions-rls-guide.md) Section 8 for all 11 role definitions.
 
 #### 3.4.2b Configure OneLake Security RLS (Contoso Build Demo)
 
@@ -1236,7 +1236,7 @@ For the workshop demo, we create one set of OneLake Security roles for **Group-A
    - Click **"Manage OneLake security"** in the ribbon → accept the prompt
    - A `DefaultReader` role is auto-created for existing viewers
 
-> **⚠️ Workspace Admins, Members, and Contributors bypass OneLake Security.** Only users with the **Viewer** workspace role are restricted by RLS. Ensure demo test users (e.g., Vinoth) have the **Viewer** role.
+> ** Workspace Admins, Members, and Contributors bypass OneLake Security.** Only users with the **Viewer** workspace role are restricted by RLS. Ensure demo test users (e.g., Vinoth) have the **Viewer** role.
 
 ##### Create the Contoso Build Roles
 
@@ -1283,7 +1283,7 @@ Row security expression:
 SELECT * FROM equipment.equipment_telemetry_f WHERE division = 'Contoso Build'
 ```
 
-> **Why 3 roles?** OneLake Security roles are scoped to **one table per role**. Each role applies one row security expression. Since the `division` column exists on 3 tables (financials, incidents, equipment_telemetry), you need 3 roles for Contoso Build. Procurement (materials) has no `division` column — all users see all materials.
+> **Why 3 roles?** OneLake Security roles are scoped to **one table per role**. Each role applies one row security expression. Since the `division` column exists on 3 tables (financials, incidents, equipment_telemetry), you need 3 roles for Contoso Build. Procurement (materials) has no `division` column - all users see all materials.
 
 > **Syntax:** OneLake RLS rules use a full `SELECT` statement: `SELECT * FROM {schema}.{table} WHERE {predicate}`. Supported operators: `=`, `<>`, `>`, `<`, `IN`, `AND`, `OR`, `NOT`.
 
@@ -1296,7 +1296,7 @@ Sign in as a **Group-A Viewer** user (e.g., Vinoth) and query the mirrored data 
 SELECT division, COUNT(*) as row_count
 FROM equipment.equipment_telemetry_f
 GROUP BY division;
--- Expected: one row — 'Contoso Build'
+-- Expected: one row - 'Contoso Build'
 ```
 
 If you see all 4 divisions, check:
@@ -1306,7 +1306,7 @@ If you see all 4 divisions, check:
 
 #### 3.4.3 Create a Fabric Data Agent
 
-A Fabric Data Agent provides a natural language interface over your mirrored data — similar to Genie but within the Fabric ecosystem.
+A Fabric Data Agent provides a natural language interface over your mirrored data - similar to Genie but within the Fabric ecosystem.
 
 1. In your Fabric workspace, click **+ New item** → search for **"Data agent"**
 2. Name it: `Project Intelligence Agent`
@@ -1357,8 +1357,8 @@ Once published, the Fabric Data Agent can be consumed in multiple ways:
 
 **In Power BI Reports (Direct Lake):**
 1. Create a new Power BI report connected to the mirrored data
-2. Use **Direct Lake mode** — queries go directly to the Delta Lake files
-3. No data import, no scheduled refresh — always current
+2. Use **Direct Lake mode** - queries go directly to the Delta Lake files
+3. No data import, no scheduled refresh - always current
 
 **Programmatically (Fabric Notebook or external app):**
 ```python
@@ -1386,9 +1386,9 @@ When you combine both options, the architecture looks like this:
    Genie MCP Server                    Fabric Mirroring
    (managed, /api/2.0/mcp/)           (metadata shortcuts)
         │                                   │
-        ▼                                   ▼
+                                           
    Foundry Agent                    Microsoft Fabric
-   (MCP tool — ad-hoc queries)      ┌───────┴───────┐
+   (MCP tool - ad-hoc queries)      ┌───────┴───────┐
                                     │               │
                               SQL Analytics    Fabric Data Agent
                               Endpoint         (NL-to-SQL)
@@ -1401,11 +1401,11 @@ When you combine both options, the architecture looks like this:
 
 | Pros | Cons |
 |------|------|
-| No data duplication — metadata-only mirroring | Requires Microsoft Fabric capacity (F2+) |
-| Power BI Direct Lake mode — always current | Fabric Data Agent is Preview |
+| No data duplication - metadata-only mirroring | Requires Microsoft Fabric capacity (F2+) |
+| Power BI Direct Lake mode - always current | Fabric Data Agent is Preview |
 | T-SQL access to Databricks tables | Additional Fabric cost on top of Databricks |
 | Fabric Data Agent provides NL-to-SQL | More moving parts than Genie MCP |
-| Copilot in Power BI integration | Propagation delay (seconds–minutes) |
+| Copilot in Power BI integration | Propagation delay (seconds-minutes) |
 | Enterprise governance via Fabric workspace | Materialized views and streaming tables not supported |
 
 ---
@@ -1430,10 +1430,10 @@ In Module 5, we'll implement the **Genie MCP** approach as the primary Databrick
 
 | Concern | Genie MCP Mitigation | Fabric Mirroring Mitigation |
 |---------|---------------------|-----------------------------|
-| Data exfiltration via agent | Genie generates read-only SQL — no arbitrary writes | Fabric workspace permissions + RLS |
+| Data exfiltration via agent | Genie generates read-only SQL - no arbitrary writes | Fabric workspace permissions + RLS |
 | Authentication | **OAuth Identity Passthrough** (Custom Entra ID app per user) | Entra ID / Service Principal |
 | Cross-division data access | Unity Catalog row filters & column masks enforced per user | Fabric workspace-level + UC-level permissions |
-| Credential management | No PAT tokens — OAuth managed by platform | No PAT tokens — Entra ID connection |
+| Credential management | No PAT tokens - OAuth managed by platform | No PAT tokens - Entra ID connection |
 | Network security | Private Endpoints (Databricks + Foundry) in production | Private Endpoints (Fabric + Databricks) |
 | Audit trail | Foundry agent logs + Databricks query history | Fabric audit logs + Databricks query history |
 
@@ -1449,14 +1449,14 @@ If your use case goes beyond Genie, Databricks provides additional managed MCP s
 | **Unity Catalog Functions** | Run predefined SQL functions (e.g., calculate EVM metrics) | `/api/2.0/mcp/functions/{catalog}/{schema}/{function}` |
 | **SQL** | AI-generated SQL for data pipelines (read and write) | `/api/2.0/mcp/sql` |
 
-These can be combined — for example, a single Foundry agent could have:
+These can be combined - for example, a single Foundry agent could have:
 - Genie MCP (for NL-to-SQL on structured data)
 - Vector Search MCP (for document similarity search)
 - UC Functions MCP (for custom business logic)
 
 ---
 
-## Checkpoint ✓
+## Checkpoint 
 
 - [ ] Understand both Databricks-to-Foundry integration patterns (Genie MCP and Fabric Mirroring)
 - [ ] Genie Space created in Databricks with workshop tables and instructions
