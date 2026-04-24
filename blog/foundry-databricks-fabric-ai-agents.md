@@ -1,78 +1,75 @@
-# Building an AI agent that actually talks to your data
+# Connecting Microsoft Foundry agents to enterprise data with Databricks Genie and Fabric
 
-Most enterprise AI demos hit the same wall. You build a chatbot, connect it to GPT-4o, and it answers general questions well enough. Then someone asks "what's our cost overrun on the Queensland rail project?" and the bot hallucinates a number. Your data lives in Databricks, Fabric, or a dozen other systems, and the agent has no idea any of it exists.
+This project demonstrates how to build a Microsoft Foundry agent that queries live enterprise data across Azure Databricks and Microsoft Fabric. The full source code and deployment scripts are available at [github.com/KietNhiTran/aiws-public](https://github.com/KietNhiTran/aiws-public).
 
-This post walks through how we built a working multi-source AI agent using Microsoft Foundry, Databricks Genie, and Fabric Data Agents. The full source code is open at [github.com/KietNhiTran/aiws-public](https://github.com/KietNhiTran/aiws-public).
+## Microsoft Foundry
 
-## What Foundry actually does
+Microsoft Foundry is the agent platform on Azure. You create agents, attach tools, evaluate them, and deploy to production. The platform provides built-in tools including Bing-grounded web search, a code interpreter (sandboxed Python), file search, and Azure AI Search. You can extend agents with custom function tools, OpenAPI specs, or MCP (Model Context Protocol) connections to external services.
 
-Microsoft Foundry (previously Azure AI Foundry) is an agent management platform. You create agents, give them tools, and deploy them. That part is straightforward. What makes it useful in practice is the tool catalog.
+Foundry handles agent versioning, batch evaluation against test datasets, and deployment behind API endpoints. This makes it the management and orchestration layer, not just a chat interface.
 
-Out of the box, an agent can use web search (Bing-grounded), a code interpreter (runs Python in a sandbox), file search over uploaded documents, and Azure AI Search for RAG over your own indexes. You can also add custom function tools or connect to external services through MCP (Model Context Protocol) or API specs.
+> [INSERT SCREENSHOT: Foundry portal showing an agent with multiple tools configured]
 
-The point is that Foundry agents aren't just chat wrappers. They're orchestrators that pick the right tool for each question. Ask about public news, the agent calls web search. Ask it to calculate something, it writes and runs Python. Ask about your project data, it calls Genie or a Fabric Data Agent.
+## Microsoft Fabric and Data Agents
 
-> [INSERT GIF: Foundry agent switching between web search, code interpreter, and Genie tool in a single conversation]
+Microsoft Fabric unifies data warehousing, engineering, and business intelligence in one platform. If your organisation uses Power BI, your semantic models already live in Fabric.
 
-## A quick word on Fabric and Data Agents
+Fabric Data Agents query data sources within a Fabric workspace: lakehouses, SQL databases, Power BI semantic models, and mirrored databases. You configure each agent with natural language instructions describing the data and how to respond. The agent translates user questions into queries against those sources.
 
-Microsoft Fabric is a unified analytics platform that brings together data warehousing, data engineering, data science, and business intelligence into one product. If your org already uses Power BI, Fabric is where those semantic models live.
+Fabric Data Agents can be registered as tools in Foundry. This means your existing Power BI semantic models and lakehouse tables become accessible to a Foundry agent alongside web search, code interpreter, and other tools.
 
-Fabric Data Agents are a relatively new addition. You point them at data sources within your Fabric workspace (lakehouses, SQL databases, semantic models, mirrored databases) and give them natural language instructions. The agent then answers questions by querying those sources directly. Think of them as Fabric-native copilots that understand your data schema and business context.
+## Architecture
 
-The interesting part: you can bring a Fabric Data Agent into Foundry as a tool, alongside other tools your agent already uses. Your Power BI semantic models, lakehouse tables, and SQL databases become queryable through natural language in the same agent that also has web search and code execution.
+> [INSERT DIAGRAM: Foundry agent at center. Left side: MCP connection to Databricks Genie, pointing to Unity Catalog with RLS. Right side: Fabric Data Agent connection, pointing to lakehouse, SQL DB, mirrored Databricks catalog, and Power BI semantic model]
 
-## The architecture
+There are two integration paths. Both require no code on the Foundry side.
 
-Here's what the full setup looks like.
+**Databricks Genie via MCP** - Databricks exposes managed MCP servers for Genie Spaces. A Genie Space is a curated NL-to-SQL interface over specific Unity Catalog tables, with author-defined instructions and sample queries. You register the MCP endpoint in Foundry, and the agent sends natural language questions to Genie, which generates SQL, executes it on a SQL Warehouse, and returns results. Unity Catalog permissions including row-level security are enforced per user via Entra ID passthrough.
 
-> [INSERT DIAGRAM: Architecture showing Foundry agent at center, with MCP connection to Databricks Genie on one side and Fabric Data Agent connection on the other. Databricks side shows Unity Catalog tables with RLS. Fabric side shows lakehouse, SQL DB, mirrored Databricks catalog, and semantic model feeding into 5 Data Agents]
+**Fabric mirroring + Data Agents** - Fabric mirrors Unity Catalog metadata (no data movement), giving Fabric read access to Databricks tables. You then configure Fabric Data Agents over the mirrored tables alongside lakehouse data, SQL databases, and semantic models. This path is suited for organisations that want to combine Databricks data with existing Fabric assets, particularly Power BI semantic models that already contain business logic and measures.
 
-There are two paths from Foundry to your Databricks data. Both are zero-code on the Foundry side.
+## Why Foundry as the orchestration layer
 
-**Path 1: Genie through MCP.** Databricks exposes managed MCP servers for Genie Spaces. You register the MCP endpoint in Foundry, and your agent can ask natural language questions against any Genie Space. Genie translates the question to SQL, runs it against a SQL Warehouse, and returns the result. All Unity Catalog permissions (including row-level security) are enforced per user through Entra ID passthrough.
+Genie handles structured data queries well. Fabric Data Agents do the same within Fabric. Foundry adds value by composing these with other capabilities in a single agent.
 
-**Path 2: Fabric mirroring.** Fabric can mirror your Unity Catalog, which means Fabric gets read access to your Databricks tables without copying data. You then set up Fabric Data Agents over those mirrored tables, add a lakehouse and SQL database for supplementary data, and wire the whole thing into Foundry. This path is better when you want to combine Databricks data with other Fabric sources like Power BI models or curated SQL summaries.
+A user asks "show me projects over budget" and the agent calls Genie. The follow-up is "what are the current regulatory requirements for that project type?" and the agent uses web search. Next, "calculate the projected cost at completion using CPI from the data" and the agent runs the formula in code interpreter. One conversation, three different tools, selected automatically.
 
-We implemented both. The Genie path took about 15 minutes to configure. The Fabric path took longer because of the workspace setup, but the deployment scripts in our repo automate most of it.
+> [INSERT GIF: Single conversation where the agent uses Genie for data, web search for context, and code interpreter for a calculation]
 
-## Why not just use Genie directly?
+Foundry also provides the production lifecycle. You evaluate agent accuracy with batch runs, compare versions, and deploy to an API endpoint with authentication and monitoring. This is the layer that moves an agent from prototype to production.
 
-Genie is excellent for structured data queries. But Foundry adds capabilities that Genie alone doesn't have.
+## What the project deploys
 
-A user might ask a question that starts with data ("show me red-status projects") and then follow up with something that needs web context ("what are the latest safety regulations for tunnel construction in NSW?"). Genie can't answer the second question. A Foundry agent can, because it also has web search.
+The repository contains deployment scripts for the full stack:
 
-Or someone asks "calculate the projected cost at completion using the CPI from our data." The agent fetches the CPI through Genie, then uses the code interpreter to run the EAC formula and return the result with a chart. That multi-step reasoning across tools is what Foundry handles.
+**Databricks** (Databricks Asset Bundles):
+- Four Unity Catalog tables with synthetic data across projects, equipment, safety, and procurement
+- Row-level security with group-based filtering per division
+- Five Genie Spaces with domain-specific instructions
+- A medallion pipeline (bronze, silver, gold) for supply chain data
 
-> [INSERT GIF: Agent answering a data question via Genie, then a follow-up using web search, in one thread]
+**Fabric** (Python scripts):
+- Workspace with lakehouse, SQL database, semantic model, and mirrored Databricks catalog
+- Five Data Agents with pre-written instructions and data source mappings
+- Agent instruction files ready to paste into the Fabric portal
 
-Foundry also gives you agent versioning, evaluation pipelines, and a deployment model for production. You can run batch evaluations against test datasets, compare agent versions on accuracy, and deploy behind an API endpoint. Genie doesn't cover that lifecycle.
+> [INSERT SCREENSHOT: Fabric workspace showing the deployed lakehouse, SQL database, mirrored catalog, and Data Agents]
 
-## What we built
+**Configuration** - All deployment is driven by a single `.env.example` file. You provide your Azure tenant, Databricks workspace URL, Fabric capacity name, and catalog details. The scripts handle the rest.
 
-The [open-source workshop](https://github.com/KietNhiTran/aiws-public) includes everything needed to reproduce this setup:
+```
+# Clone and configure
+git clone https://github.com/KietNhiTran/aiws-public.git
+cp .env.example .env.local
+# Fill in your values, then deploy:
+cd src/databricks && databricks bundle deploy -t dev
+cd src/fabric && python scripts/01_deploy_workspace.py
+```
 
-**Databricks side** (deployed via Asset Bundles):
-- Four Unity Catalog tables with synthetic data (projects, equipment, safety, procurement)
-- Row-level security configured with groups, so different users see different divisions
-- Five Genie Spaces with curated instructions for each domain
-- A medallion pipeline (bronze/silver/gold) for supply chain data
+> [INSERT GIF: Terminal showing the deployment running]
 
-**Fabric side** (deployed via Python scripts):
-- A workspace with a lakehouse, SQL database, semantic model, and mirrored Databricks catalog
-- Five Data Agents, each with detailed instructions and specific data source assignments
-- Agent instruction files you can copy-paste directly into the Fabric portal
+## Summary
 
-**Foundry side:**
-- An agent with MCP tools for Genie and connections to Fabric Data Agents
-- Web search and code interpreter enabled for multi-source reasoning
+This project connects Microsoft Foundry to enterprise data in Databricks and Fabric using two zero-code integration paths: Genie MCP for direct NL-to-SQL, and Fabric mirroring with Data Agents for combined Fabric and Databricks data access. Foundry provides the agent management layer on top, with web search, code interpreter, evaluation, and production deployment.
 
-Everything is parameterized through environment files. No hardcoded credentials, workspace IDs, or customer names. Clone the repo, fill in your `.env.local`, run the deployment scripts, and you have a working environment.
-
-> [INSERT GIF: Running the deployment, showing Databricks bundle deploy and Fabric workspace creation]
-
-## Where this is heading
-
-The gap between "AI demo" and "AI that works with our data" has been the main blocker for most enterprise teams we've talked to. The tooling has caught up. Genie MCP and Fabric Data Agents both went from preview to usable in the last few months, and Foundry's tool catalog makes it possible to compose them without writing middleware.
-
-If you want to try it, start with the repo. Module 3 has the full walkthrough: [modules/03-databricks-integration.md](https://github.com/KietNhiTran/aiws-public/blob/master/modules/03-databricks-integration.md).
+Full walkthrough: [modules/03-databricks-integration.md](https://github.com/KietNhiTran/aiws-public/blob/master/modules/03-databricks-integration.md)
