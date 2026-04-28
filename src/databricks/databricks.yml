@@ -1,0 +1,86 @@
+bundle:
+  name: contoso-databricks-workshop
+
+# Variables  -  override per target or via CLI
+variables:
+  catalog_name:
+    default: contoso_dev
+    description: Unity Catalog catalog name (use your workspace catalog)
+  warehouse_name:
+    default: Serverless Starter Warehouse
+    description: SQL Warehouse to attach to Genie Space
+  cluster_id:
+    default: ""
+    description: Existing cluster ID (avoids spinning up new clusters per task)
+  external_storage_path:
+    default: ""
+    description: ADLS path for external Delta tables (e.g. abfss://container@account.dfs.core.windows.net/path)
+  num_telemetry_rows:
+    default: "5000"
+    description: Number of equipment telemetry rows to generate
+  num_incident_rows:
+    default: "1500"
+    description: Number of safety incident rows to generate
+  num_procurement_rows:
+    default: "1200"
+    description: Number of procurement material rows to generate
+  num_project_rows:
+    default: "120"
+    description: Number of project financial rows to generate
+  customer_name:
+    default: "Contoso"
+    description: Customer display name (used in Genie Space titles, RLS group names, etc.)
+  num_projects:
+    default: "120"
+    description: Number of projects for Module 03 setup
+  num_material_rows:
+    default: "1200"
+    description: Number of procurement material rows to generate
+  databricks_host:
+    default: ""
+    description: Databricks workspace URL
+
+workspace:
+  # Host is set per target in the targets section below.
+  # Do NOT set host here — DABS cannot resolve ${var.*} before auth validation.
+
+# Shared resources  -  included from resources/ folder
+include:
+  - resources/*.yml
+
+# Targets
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      host: "REPLACE_WITH_DEV_WORKSPACE_URL"
+    variables:
+      databricks_host: "REPLACE_WITH_DEV_WORKSPACE_URL"
+      cluster_id: "REPLACE_WITH_DEV_CLUSTER_ID"
+      catalog_name: contoso_dev
+      customer_name: "Contoso"
+      external_storage_path: "abfss://datalake@REPLACE_ACCOUNT.dfs.core.windows.net/contoso-dev"
+
+  staging:
+    mode: development
+    workspace:
+      host: "REPLACE_WITH_STAGING_WORKSPACE_URL"
+    variables:
+      databricks_host: "REPLACE_WITH_STAGING_WORKSPACE_URL"
+      cluster_id: "REPLACE_WITH_STAGING_CLUSTER_ID"
+      catalog_name: "REPLACE_WITH_STAGING_CATALOG"
+      customer_name: "REPLACE_WITH_STAGING_CUSTOMER_NAME"
+      external_storage_path: "REPLACE_WITH_STAGING_ADLS_PATH"
+
+  production:
+    mode: production
+    workspace:
+      host: "REPLACE_WITH_PROD_WORKSPACE_URL"
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      databricks_host: "REPLACE_WITH_PROD_WORKSPACE_URL"
+      cluster_id: "REPLACE_WITH_PROD_CLUSTER_ID"
+      catalog_name: "contoso_prod"
+      customer_name: "Contoso"
+      external_storage_path: "abfss://datalake@REPLACE_ACCOUNT.dfs.core.windows.net/contoso-prod"
