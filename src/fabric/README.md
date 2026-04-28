@@ -1,6 +1,6 @@
 # Fabric Workspace Deployment — Contoso AI Workshop
 
-Deploy and populate a Microsoft Fabric workspace (`contoso-ws-dev`) with all items needed for the Data Agent multi-source demo.
+Deploy and populate a Microsoft Fabric workspace (`contoso-aiws-dev`) with all items needed for the Data Agent multi-source demo.
 
 ## Architecture
 

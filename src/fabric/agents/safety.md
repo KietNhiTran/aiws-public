@@ -86,23 +86,23 @@ COLUMNS:
 - incident_date (date, when the incident occurred)
 - site_name (str, project site or location)
 - division (str: Division-Alpha|Division-Beta|Division-Gamma|Division-Delta)
-- incident_type (str: Fall|Struck By|Caught Between|Chemical Exposure|Vehicle Incident|Near Miss|Environmental)
-- severity (str: Critical|Major|Moderate|Minor)
+- incident_type (str: Slip/Trip/Fall|Vehicle Interaction|Equipment Failure|Falling Object|Chemical Exposure|Heat Stress|Noise Exposure|Confined Space|Electrical|Struck By|Manual Handling|Working at Height)
+- severity (str: Minor|Moderate|Serious|Critical)
 - description (str, narrative description of what happened)
 - injuries (int, number of people injured — 0 for near misses)
 - lost_time_days (int, calendar days lost to injury — 0 if no lost time)
-- root_cause (str: Human Error|Equipment Failure|Procedural Gap|Environmental Conditions|Training Deficiency)
+- root_cause (str: human_error|equipment_failure|procedural|environmental|design|poor_housekeeping|inadequate_training)
 - corrective_action (str, remedial action taken or planned)
-- status (str: Open|Closed|Overdue — investigation/action status)
+- status (str: open|investigating|closed — investigation/action status)
 
 KEY RULES:
 - LTI (Lost Time Injury) = any incident where lost_time_days > 0
 - Near Miss = incident_type = 'Near Miss' AND injuries = 0
-- "Significant Incidents" for exec reporting = severity IN ('Critical', 'Major')
+- "Significant Incidents" for exec reporting = severity IN ('Critical', 'Serious')
 - Monthly trends: GROUP BY FORMAT(incident_date, 'yyyy-MM') or YEAR/MONTH
 - Sites with increasing frequency = compare month-over-month counts
-- Always order severity: Critical → Major → Moderate → Minor
-- Overdue corrective actions = status = 'Overdue' — flag these prominently
+- Always order severity: Critical → Serious → Moderate → Minor
+- Open corrective actions/investigations = status IN ('open', 'investigating') — flag these prominently
 ```
 
 ### Source: contoso_lakehouse — safetykpis — Instructions

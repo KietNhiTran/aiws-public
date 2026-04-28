@@ -84,9 +84,10 @@ print(f"[OK] Schema: {catalog}.security")
 # "generic": uses Group-A/B/C for environments without customer-specific groups
 if group_style == "customer-division":
     DIVISION_GROUPS = {
-        "Division-Alpha": f"{customer}-Division-CPB",
-        "Division-Beta": f"{customer}-Division-Division-Beta",
-        "Division-Gamma": f"{customer}-Division-Division-Gamma",
+        "Division-Alpha": f"{customer}-Division-Alpha",
+        "Division-Beta": f"{customer}-Division-Beta",
+        "Division-Gamma": f"{customer}-Division-Gamma",
+        "Division-Delta": f"{customer}-Division-Delta",
     }
     exec_group = f"{customer}-Division-Executives"
 else:
@@ -94,6 +95,7 @@ else:
         "Division-Alpha": "Group-A",
         "Division-Beta": "Group-B",
         "Division-Gamma": "Group-C",
+        "Division-Delta": "Group-D",
     }
     exec_group = "Group-Executives"
 

@@ -98,7 +98,7 @@ COLUMNS:
 - cost_variance_pct (decimal, negative = over budget)
 - spi (decimal, Schedule Performance Index — >1.0 ahead of schedule, <1.0 behind)
 - cpi (decimal, Cost Performance Index — >1.0 under budget, <1.0 over budget)
-- status (str: Green|Amber|Red — project RAG status)
+- status (str: green|amber|red — project RAG status)
 - start_date (date)
 - planned_completion (date)
 - reporting_period (date — filter by MAX(reporting_period) for latest data)

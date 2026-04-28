@@ -97,17 +97,17 @@ COLUMNS:
 - fuel_level_pct (decimal 0-100, fuel tank level — NULL for electric units)
 - operating_hours (int, cumulative engine run hours)
 - maintenance_due_date (date, next scheduled preventive maintenance)
-- status (str: Active|Maintenance|Idle|Decommissioned)
+- status (str: operational|warning|critical|maintenance)
 - reading_timestamp (datetime, when this sensor reading was captured)
 
 KEY RULES:
 - Temperature alerts: > 110°C = CRITICAL (immediate shutdown), 105-110°C = WARNING (monitor closely)
-- Fuel alerts: < 10% = LOW FUEL for active equipment
-- Overdue maintenance: maintenance_due_date < GETDATE() AND status IN ('Active', 'Idle')
+- Fuel alerts: < 10% = LOW FUEL for in-service equipment (status IN ('operational', 'warning', 'critical'))
+- Overdue maintenance: maintenance_due_date < GETDATE() AND status IN ('operational', 'warning', 'critical')
 - Days overdue: DATEDIFF(day, maintenance_due_date, GETDATE())
-- Fleet utilisation: COUNT(status='Active') / COUNT(status != 'Decommissioned') × 100
+- Fleet utilisation: COUNT(CASE WHEN status IN ('operational', 'warning', 'critical') THEN 1 END) / COUNT(*) × 100
 - Operating hours > 10,000: flag for major service review
-- Exclude Decommissioned from all fleet health calculations
+- Exclude maintenance from in-service and fleet utilisation calculations; treat warning and critical as still deployed but needing attention
 - Use site_name to join with incidents_f for site-level risk correlation
 ```
 

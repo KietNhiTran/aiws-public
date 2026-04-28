@@ -2,7 +2,7 @@
 """
 Populate Fabric SQL Database — Contoso AI Workshop
 
-Populates contoso_sqldb with Contoso summary data using the Fabric REST API SQL endpoint.
+Generates a SQL script (DDL + INSERT statements) with Contoso summary data.
 Data uses same random.seed(42) distributions as databricks/src/02_generate_data.py.
 
 Tables populated:
@@ -16,10 +16,11 @@ Usage:
   python fabric/scripts/02_populate_sql_db.py
   python fabric/scripts/02_populate_sql_db.py --workspace-id <ws-id> --sqldb-id <db-id>
 
+The generated SQL file can be copy-pasted into the Fabric SQL editor for execution.
 If IDs not provided, reads from fabric/scripts/config.json (output of 01_deploy_workspace.py).
 """
 
-import argparse, json, subprocess, sys, os, random, datetime
+import argparse, json, os, random, datetime
 
 random.seed(42)
 
@@ -100,8 +101,9 @@ def generate_monthly_kpis():
     rows = []
     base_date = datetime.date(2025, 1, 1)
     for month_offset in range(12):
-        month = base_date + datetime.timedelta(days=month_offset * 30)
-        month_str = month.strftime("%Y-%m-01")
+        year = base_date.year + (base_date.month + month_offset - 1) // 12
+        month_num = (base_date.month + month_offset - 1) % 12 + 1
+        month_str = f"{year}-{month_num:02d}-01"
         for div in DIVISIONS:
             p = DIVISION_PROFILES[div]
             seasonal = 1.0 + 0.1 * (month_offset % 3 - 1)  # seasonal variation
@@ -131,8 +133,9 @@ def generate_manufacturing_kpis():
     rows = []
     base_date = datetime.date(2025, 1, 1)
     for month_offset in range(12):
-        month = base_date + datetime.timedelta(days=month_offset * 30)
-        month_str = month.strftime("%Y-%m-01")
+        year = base_date.year + (base_date.month + month_offset - 1) // 12
+        month_num = (base_date.month + month_offset - 1) % 12 + 1
+        month_str = f"{year}-{month_num:02d}-01"
         for div in DIVISIONS:
             p = DIVISION_PROFILES[div]
             seasonal = 1.0 + 0.08 * (month_offset % 4 - 2)
@@ -290,36 +293,15 @@ def main():
             f.write(full_sql)
         print(f"[OK] SQL written to {args.output_sql}")
 
-    # Execute via Fabric REST API if IDs available
+    # Provide instructions for manual execution
     if args.workspace_id and args.sqldb_id:
-        print(f"\n[INFO] Executing SQL against Fabric SQL Database...")
+        print(f"\n[INFO] To populate the Fabric SQL Database:")
         print(f"  Workspace: {args.workspace_id}")
         print(f"  SQL DB:    {args.sqldb_id}")
-
-        token_result = subprocess.run(
-            ["az", "account", "get-access-token", "--resource", "https://api.fabric.microsoft.com",
-             "--query", "accessToken", "-o", "tsv"],
-            capture_output=True, text=True
-        )
-        if token_result.returncode != 0:
-            print(f"[WARN] az CLI not available — SQL file written but not executed")
-            print(f"  Copy {args.output_sql} to Fabric SQL editor and run manually")
-            return
-
-        token = token_result.stdout.strip()
-        try:
-            import requests
-            # Execute SQL via Fabric SQL endpoint
-            # Note: Direct SQL execution via REST API may require the TDS endpoint
-            # For now, write the SQL file and instruct manual execution
-            print(f"[INFO] Fabric SQL Database does not support direct SQL execution via REST API.")
-            print(f"  To populate the database:")
-            print(f"  1. Open Fabric portal → SQL Database 'contoso_sqldb'")
-            print(f"  2. Click 'New Query'")
-            print(f"  3. Paste contents of: {args.output_sql}")
-            print(f"  4. Click 'Run'")
-        except ImportError:
-            print("[WARN] requests not installed — SQL file written, execute manually")
+        print(f"  1. Open Fabric portal → SQL Database 'contoso_sqldb'")
+        print(f"  2. Click 'New Query'")
+        print(f"  3. Paste contents of: {args.output_sql}")
+        print(f"  4. Click 'Run'")
     else:
         print(f"\n[INFO] No workspace/sqldb IDs — SQL file written only")
         print(f"  Run 01_deploy_workspace.py first, or provide --workspace-id and --sqldb-id")

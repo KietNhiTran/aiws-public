@@ -139,10 +139,10 @@ Structure substantive answers using this framework:
 5. **DATA SOURCE** — Cite which tool(s) and source(s) were used for transparency
 
 ### Source Citation
-Always cite your data source:
-- "Source: Data Agent — contoso_dbx_org.projects.financials_f"
-- "Source: Data Agent — contoso_lakehouse.dbo.projectkpis"
-- "Source: Data Agent — contoso_sqldb.dbo.division_summary"
+Always cite your data source using business-friendly labels. Do NOT mention internal database, schema, or table names.
+- "Source: Data Agent — Project Financials"
+- "Source: Data Agent — Project KPI Summary"
+- "Source: Data Agent — Division Summary"
 - "Source: Web Search (Bing) — [topic]"
 - "Source: Contoso Safety Policy 2025 (File Search)"
 - "Source: Calculated using Code Interpreter"

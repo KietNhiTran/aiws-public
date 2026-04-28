@@ -91,14 +91,14 @@ COLUMNS:
 - lead_time_days (int, days from order to delivery)
 - last_order_date (date, most recent order placed)
 - last_order_qty (int, quantity of most recent order)
-- price_trend (str: Rising|Stable|Falling — direction of price movement)
-- availability (str: In Stock|Limited|Backordered|Discontinued)
+- price_trend (str: increasing|stable|decreasing — direction of price movement)
+- availability (str: good|moderate|limited|out_of_stock)
 
 KEY RULES:
 - Estimated spend = unit_price_aud × last_order_qty (proxy for annual spend)
 - lead_time_days > 30 = long-lead risk item
-- Backordered or Discontinued availability = supply risk — flag prominently
-- Rising price_trend + long lead time = high procurement risk
+- limited or out_of_stock availability = supply risk — flag prominently
+- increasing price_trend + long lead time = high procurement risk
 - Supplier concentration: if one supplier provides > 30% of a category's materials, flag as concentration risk
 - This table has no division column — materials are shared reference data across all divisions
 - To get division-level procurement view, join with supplier_scorecard on supplier name/category

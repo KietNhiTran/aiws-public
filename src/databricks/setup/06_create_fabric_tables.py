@@ -86,8 +86,8 @@ location_clause = ""
 if ext_path:
     location_clause = f"LOCATION '{ext_path}/equipment_telemetry_f'"
     spark.sql(f"DROP TABLE IF EXISTS {catalog}.equipment.equipment_telemetry_f")
-
-spark.sql(f"DROP TABLE IF EXISTS {catalog}.equipment.equipment_telemetry_f")
+else:
+    spark.sql(f"DROP TABLE IF EXISTS {catalog}.equipment.equipment_telemetry_f")
 
 spark.sql(f"""
 CREATE TABLE {catalog}.equipment.equipment_telemetry_f (

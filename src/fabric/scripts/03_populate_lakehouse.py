@@ -16,7 +16,7 @@ Usage:
   python fabric/scripts/03_populate_lakehouse.py --output-dir fabric/notebooks/lakehouse_data/
 """
 
-import random, datetime, os, sys, json
+import random, datetime, os, json
 
 random.seed(42)
 
@@ -70,8 +70,9 @@ def generate_safety_kpis():
     rows = []
     base_date = datetime.date(2025, 1, 1)
     for month_offset in range(12):
-        month = base_date + datetime.timedelta(days=month_offset * 30)
-        month_str = month.strftime("%Y-%m-01")
+        year = base_date.year + (base_date.month + month_offset - 1) // 12
+        month_num = (base_date.month + month_offset - 1) % 12 + 1
+        month_str = f"{year}-{month_num:02d}-01"
         for div in DIVISIONS:
             p = DIVISION_PROFILES[div]
             seasonal = 1.0 + 0.1 * (month_offset % 3 - 1)
@@ -148,14 +149,14 @@ def main():
             from pyspark.sql import SparkSession
             spark = SparkSession.builder.getOrCreate()
 
-            spark.createDataFrame(project_kpis).write.mode("overwrite").format("delta").saveAsTable(f"{lakehouse_name}.ProjectKPIs")
-            print(f"[OK] ProjectKPIs → {lakehouse_name}")
+            spark.createDataFrame(project_kpis).write.mode("overwrite").format("delta").saveAsTable(f"{lakehouse_name}.projectkpis")
+            print(f"[OK] projectkpis → {lakehouse_name}")
 
-            spark.createDataFrame(safety_kpis).write.mode("overwrite").format("delta").saveAsTable(f"{lakehouse_name}.SafetyKPIs")
-            print(f"[OK] SafetyKPIs → {lakehouse_name}")
+            spark.createDataFrame(safety_kpis).write.mode("overwrite").format("delta").saveAsTable(f"{lakehouse_name}.safetykpis")
+            print(f"[OK] safetykpis → {lakehouse_name}")
 
-            spark.createDataFrame(fleet_kpis).write.mode("overwrite").format("delta").saveAsTable(f"{lakehouse_name}.FleetKPIs")
-            print(f"[OK] FleetKPIs → {lakehouse_name}")
+            spark.createDataFrame(fleet_kpis).write.mode("overwrite").format("delta").saveAsTable(f"{lakehouse_name}.fleetkpis")
+            print(f"[OK] fleetkpis → {lakehouse_name}")
 
             print(f"\n[OK] All 3 tables written to {lakehouse_name}")
         except ImportError:
