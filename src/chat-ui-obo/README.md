@@ -1,4 +1,4 @@
-# CIMIC Project Advisor — Chat UI (OBO Edition)
+# Project Advisor — Chat UI (OBO Edition)
 
 A browser-based chat interface for a published Microsoft Foundry agent. This edition supports per-request **On-Behalf-Of (OBO)** authentication through Azure App Service Easy Auth, with Managed Identity available as a fallback mode.
 
