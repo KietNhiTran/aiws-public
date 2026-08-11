@@ -1,5 +1,5 @@
 """
-CIMIC Project Advisor — Chat UI Backend (FastAPI) — OBO Edition
+Project Advisor — Chat UI Backend (FastAPI) — OBO Edition
 
 A thin API layer between a browser-based chat UI and Foundry Agent Service.
 Follows the Basic Microsoft Foundry Chat reference architecture pattern:
@@ -47,7 +47,7 @@ load_dotenv(override=False)
 # Configuration
 # ---------------------------------------------------------------------------
 PROJECT_ENDPOINT = os.environ.get("PROJECT_ENDPOINT", "")
-AGENT_NAME = os.environ.get("AGENT_NAME", "cimic-project-advisor")
+AGENT_NAME = os.environ.get("AGENT_NAME", "project-advisor")
 PORT = int(os.environ.get("PORT", "8000"))
 
 # Auth mode: "obo" for On-Behalf-Of, "mi" for Managed Identity (default)
@@ -143,7 +143,7 @@ async def lifespan(app: FastAPI):
 # FastAPI app
 # ---------------------------------------------------------------------------
 app = FastAPI(
-    title="CIMIC Project Advisor — Chat UI",
+    title="Project Advisor — Chat UI",
     lifespan=lifespan,
 )
 
