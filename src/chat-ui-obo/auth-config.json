@@ -1,0 +1,38 @@
+{
+  "properties": {
+    "platform": {
+      "enabled": true
+    },
+    "globalValidation": {
+      "unauthenticatedClientAction": "RedirectToLoginPage",
+      "redirectToProvider": "azureactivedirectory"
+    },
+    "identityProviders": {
+      "azureActiveDirectory": {
+        "enabled": true,
+        "registration": {
+          "openIdIssuer": "https://sts.windows.net/<your-tenant-id>/v2.0",
+          "clientId": "<your-app-registration-client-id>",
+          "clientSecretSettingName": "MICROSOFT_PROVIDER_AUTHENTICATION_SECRET"
+        },
+        "login": {
+          "loginParameters": [
+            "scope=openid profile api://<your-app-registration-client-id>/user_impersonation",
+            "response_type=code"
+          ],
+          "disableWWWAuthenticate": false
+        },
+        "validation": {
+          "allowedAudiences": [
+            "api://<your-app-registration-client-id>"
+          ]
+        }
+      }
+    },
+    "login": {
+      "tokenStore": {
+        "enabled": true
+      }
+    }
+  }
+}
